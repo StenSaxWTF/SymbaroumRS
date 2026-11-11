@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Symbaroum Rollpersoner</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#171512">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Symbaroum">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout: one-column phone app, sticky top bar + bottom tab bar; sheets slide up for pickers and details. Single dark theme ("Davokar at dusk"). */
+:root{
+  --bg:#171512; --panel:#211e19; --panel-2:#2a2620; --line:#3b352c;
+  --text:#ebe3d2; --muted:#a59a85; --accent:#c0614a; --accent-ink:#1b1410;
+  --good:#8fa776; --bad:#e07a68;
+  --display:"Alegreya SC", "Palatino Linotype", Georgia, serif;
+  --body:"Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --r:10px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.45 var(--body);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-weight:500;margin:0;text-wrap:balance;letter-spacing:.01em}
+.app{display:flex;flex-direction:column;height:100%;max-width:760px;margin:0 auto}
+header.top{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:5}
+header.top h1{font-size:1.25rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{background:none;border:0;font-size:1.4rem;line-height:1;padding:4px 8px 4px 0;color:var(--muted)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
+.lang button{background:none;border:0;padding:5px 11px;font-size:.85rem;font-weight:700;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+main{flex:1;overflow-y:auto;padding:16px 16px 24px;-webkit-overflow-scrolling:touch}
+nav.tabs{display:flex;border-top:1px solid var(--line);background:var(--panel);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;background:none;border:0;padding:10px 4px 12px;color:var(--muted);font-size:.85rem;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-current="page"]{color:var(--text)}
+nav.tabs button[aria-current="page"] svg{color:var(--accent)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;align-items:center}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.btn{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:9px 14px;font-weight:500}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.btn.ghost{background:none}
+.btn.danger{color:var(--bad);border-color:#5a3029}
+.btn.sm{padding:5px 10px;font-size:.88rem}
+.iconbtn{background:none;border:1px solid var(--line);border-radius:8px;width:36px;height:36px;display:inline-grid;place-items:center;color:var(--muted);flex:none}
+/* character list */
+.charlist{display:grid;gap:10px}
+.charitem{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--c,#888);border-radius:var(--r);padding:12px 14px;text-align:left;width:100%}
+.charitem h3{font-size:1.15rem}
+.charitem .meta{color:var(--muted);font-size:.9rem}
+.charitem .xp{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--muted)}
+.empty{padding:28px 18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+/* character header + subtabs */
+.hero{border-left:6px solid var(--c,#888);padding-left:12px}
+.hero h2{font-size:1.6rem;line-height:1.15}
+.subtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.subtabs button{flex:none;background:none;border:1px solid var(--line);border-radius:999px;padding:6px 13px;color:var(--muted);font-size:.92rem}
+.subtabs button[aria-pressed="true"]{border-color:var(--accent);color:var(--text);background:rgba(192,97,74,.14)}
+/* trackers */
+.track{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
+.track .lbl{font-weight:500}
+.track .val{font-variant-numeric:tabular-nums;font-size:1.25rem;font-family:var(--display)}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.stepper button{background:var(--panel-2);border:0;width:36px;height:34px;font-size:1.15rem}
+.stepper span,.stepper input{min-width:42px;text-align:center;font-variant-numeric:tabular-nums;font-weight:700;background:none;border:0;width:46px}
+.bar{height:8px;border-radius:999px;background:var(--panel-2);overflow:hidden;grid-column:1/-1}
+.bar i{display:block;height:100%;background:var(--good);transition:width .2s}
+.bar.cor i{background:#9a6fb0}
+/* attributes */
+.attrs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media (min-width:560px){.attrs{grid-template-columns:repeat(4,1fr)}}
+.attr{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.attr .name{font-size:.88rem;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.tile{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:10px}
+.tile .k{font-size:.82rem;color:var(--muted)}
+.tile .v{font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile .f{font-size:.78rem;color:var(--muted)}
+.pill{display:inline-block;border-radius:999px;padding:1px 9px;font-size:.78rem;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.lv{border-color:var(--accent);color:var(--text)}
+.pill.ok{border-color:#4f6340;color:var(--good)}
+.pill.warn{border-color:#6a3a32;color:var(--bad)}
+.sec-head{display:flex;align-items:center;gap:10px}
+.sec-head h3{font-size:1.15rem;flex:1}
+.owned{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.owned button.item{display:flex;align-items:center;gap:10px;background:var(--panel);border:0;border-bottom:1px solid var(--line);padding:11px 12px;text-align:left;width:100%}
+.owned button.item:last-child{border-bottom:0}
+.owned .nm{font-weight:500}
+.owned .sub{font-size:.82rem;color:var(--muted)}
+.owned .right{margin-left:auto;display:flex;gap:6px;align-items:center;flex:none}
+/* forms */
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--muted)}
+input.t,select.t,textarea.t{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:9px 10px;color:var(--text);font-size:1rem;width:100%}
+textarea.t{min-height:90px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatches button{width:30px;height:30px;border-radius:50%;border:2px solid transparent}
+.swatches button[aria-pressed="true"]{border-color:var(--text)}
+/* sheet (modal) */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;width:100%;max-width:760px;max-height:92%;display:flex;flex-direction:column}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+.sheet-head h2{font-size:1.25rem;flex:1}
+.sheet-body{overflow-y:auto;padding:14px 16px calc(18px + env(safe-area-inset-bottom))}
+.sheet-foot{padding:10px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.sheet-foot [data-addlv]{flex:1 1 0;padding-inline:8px;white-space:nowrap}
+/* picker */
+.filters{display:flex;flex-direction:column;gap:8px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px}
+.chips button{flex:none;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:.86rem;color:var(--muted)}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.chips .lab{flex:none;align-self:center;font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-right:2px}
+.results{display:flex;flex-direction:column}
+.res{display:flex;align-items:center;gap:10px;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 2px;text-align:left;width:100%}
+.res .nm{font-weight:500}
+.res .sub{font-size:.82rem;color:var(--muted)}
+.res .right{margin-left:auto;flex:none}
+.grouphead{font-family:var(--display);font-size:.95rem;color:var(--accent);padding:14px 2px 4px;border-bottom:1px solid var(--line)}
+/* ability detail */
+.detail p{margin:0 0 .6em;max-width:68ch}
+.lvl{border-left:3px solid var(--line);padding:2px 0 2px 12px;margin:10px 0}
+.lvl.on{border-left-color:var(--accent)}
+.lvl h4{margin:0 0 3px;font-family:var(--display);font-weight:500;font-size:1rem;display:flex;gap:8px;align-items:center}
+.cmp{display:grid;grid-template-columns:1fr;gap:4px}
+.cmp .en{color:#c9c0ae;font-style:italic}
+.cmp .tag{font-size:.7rem;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:none;border:0;padding:5px 11px;font-size:.85rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--panel-2);color:var(--text);font-weight:700}
+.list-plain{display:flex;flex-direction:column;gap:8px}
+.entry{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;display:flex;gap:10px;align-items:flex-start}
+.entry .grow{flex:1;min-width:0}
+.entry .nm{font-weight:500}
+.entry .sub{font-size:.85rem;color:var(--muted);overflow-wrap:anywhere}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:8px 16px;z-index:40;font-size:.92rem;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+.note-date{font-size:.78rem;color:var(--muted)}
+.status{font-size:.85rem;display:flex;gap:8px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.dot.ok{background:var(--good)} .dot.warn{background:#d0a14a}
+.num{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <button class="back" id="backBtn" aria-label="Tillbaka" hidden>‹</button>
+    <h1 id="title">Rollpersoner</h1>
+    <div class="lang" role="group" aria-label="Språk / Language">
+      <button id="langSv" aria-pressed="true">SV</button><button id="langEn" aria-pressed="false">EN</button>
+    </div>
+  </header>
+  <main id="main"><p class="muted">Laddar…</p></main>
+  <nav class="tabs" id="tabs">
+    <button data-nav="chars" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.2-4 4-6 7.5-6s6.3 2 7.5 6"/></svg><span data-t="navChars">Rollpersoner</span></button>
+    <button data-nav="lib"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4.5h5.5a2 2 0 0 1 2 2V20a2 2 0 0 0-2-2H5zM19 4.5h-5.5a2 2 0 0 0-2 2V20a2 2 0 0 1 2-2H19z"/></svg><span data-t="navLib">Bibliotek</span></button>
+    <button data-nav="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg><span data-t="navSettings">Inställningar</span></button>
+  </nav>
+</div>
+<div id="layer"></div>
+<input type="file" id="fileIn" accept="application/json,.json" hidden>
+
+<script src="config.js"></script>
+<script src="vendor/supabase.js"></script>
+<script>
+"use strict";
+/* ---------- i18n ---------- */
+const STR={
+sv:{account:"Konto",signedInAs:"Inloggad som",signOut:"Logga ut",changePw:"Byt lösenord",newPw:"Nytt lösenord (minst 8 tecken)",pwShort:"Lösenordet måste vara minst 8 tecken",pwChanged:"Lösenordet är bytt",
+loginTitle:"Logga in",loginHint:"Använd e-post och lösenord som du fått av den som driver appen.",email:"E-post",password:"Lösenord",signIn:"Logga in",badLogin:"Fel e-post eller lösenord.",noNet:"Ingen internetanslutning.",
+rulesErr:"Regeldata kunde inte laddas. Kontrollera anslutningen och ladda om sidan.",offline:"Kunde inte nå servern. Ändringar sparas på enheten och synkas när du är online igen.",
+install:"Installera som app",installHint:"iPhone/iPad: öppna sidan i Safari, tryck på Dela och välj Lägg till på hemskärmen. Dator: klicka på installera-ikonen i adressfältet i Chrome eller Edge. Logga in en gång i den installerade appen.",
+navChars:"Rollpersoner",navLib:"Bibliotek",navSettings:"Inställningar",back:"Tillbaka",loading:"Laddar…",
+newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",color:"Färg",
+save:"Spara",cancel:"Avbryt",del:"Radera",edit:"Redigera",add:"Lägg till",close:"Stäng",confirmDel:"Radera {x}? Det går inte att ångra.",
+tOverview:"Översikt",tAbilities:"Förmågor",tCombat:"Strid",tGear:"Utrustning",tNotes:"Anteckningar",
+attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",
+accurate:"Träffsäker",cunning:"Listig",discreet:"Diskret",persuasive:"Övertygande",quick:"Kvick",resolute:"Viljestark",strong:"Stark",vigilant:"Vaksam",
+toughness:"Tålighet",pain:"Smärtgräns",defense:"Försvar",corrThr:"Korruptionströskel",abomThr:"Styggelsetröskel",
+current:"Nu",damage:"Skada",tempCorr:"Temporär korruption",permCorr:"Permanent korruption",totalCorr:"Total korruption",
+derived:"Sekundära egenskaper",modifier:"Justering",
+xp:"Erfarenhet",xpTotal:"Totalt",xpSpent:"Använt",xpLeft:"Kvar",xpHint:"Totalt inklusive de 50 du startar med. Använt räknas ut från förmågor, krafter, ritualer, fördelar och nackdelar.",
+secAbilities:"Förmågor & traditioner",secMystic:"Mystiska krafter & ritualer",secTraits:"Särdrag, fördelar & nackdelar",
+addAbility:"Lägg till förmåga",addMystic:"Lägg till kraft/ritual",addTrait:"Lägg till särdrag",
+none:"Inget tillagt.",free:"Gratis (räknas inte i erfarenhet)",remove:"Ta bort från rollpersonen",level:"Nivå",
+novice:"Novis",adept:"Gesäll",master:"Mästare",
+weapons:"Vapen",armors:"Rustningar",newWeapon:"Nytt vapen",newArmor:"Ny rustning",dmg:"Skada",quality:"Kvaliteter",attr:"Karaktärsdrag",mainW:"Huvudvapen",worn:"Bärs",
+prot:"Skydd",impede:"Begränsning",impedeHint:"Avdrag på Försvar, t.ex. −2",
+gear:"Utrustning",newItem:"Ny sak",cost:"Kostnad",note:"Anteckning",money:"Pengar",daler:"Daler",skilling:"Skilling",ortug:"Örtegar",
+notes:"Anteckningar",newNote:"Ny anteckning",noteHint:"Skriv en anteckning…",
+search:"Sök på namn eller text",all:"Alla",sort:"Sortera",sortName:"Namn",sortGroup:"Grupp",sortBook:"Bok",typ:"Typ",tradition:"Tradition",book:"Bok",arche:"Arketyp",
+results:"{n} träffar",added:"{x} tillagd",already:"Redan tillagd",onlyFor:"Endast för {x}",material:"Material",race_:"Släkte",
+showLang:"Visa",both:"Båda",
+settings:"Inställningar",language:"Språk",storage:"Lagring",synced:"Sparat och synkat med ditt konto.",localOnly:"Sparas bara i den här webbläsaren. Öppna sidan inloggad på claude.ai för att synka.",connecting:"Ansluter…",
+backup:"Säkerhetskopia",exportBtn:"Spara säkerhetskopia (.json)",copyBtn:"Kopiera som text",importBtn:"Läs in säkerhetskopia",importPaste:"Klistra in säkerhetskopia",importDone:"{n} rollpersoner inlästa",importBad:"Det gick inte att läsa filen. Är det en säkerhetskopia från den här appen?",copied:"Kopierat",
+dataTitle:"Om regeldata",dataBody:"312 poster från Grundbok, Spelarens handbok, Monsterkodex och förmågekort, på svenska och engelska. Rättat mot Mega symbaroum: Förvisning tillagd (saknades), Skräckslå rensad från inblandad text, stavfel i namn rättade, avstavningar från PDF borttagna.",
+exportDone:"Säkerhetskopian sparad",exportFail:"Nedladdningen avbröts. Använd Kopiera som text i stället.",
+types:{ability:"Förmåga",tradition:"Tradition",power:"Kraft",ritual:"Ritual",trait:"Särdrag",monstrous:"Monstruöst särdrag",boon:"Fördel",burden:"Nackdel"},
+typesP:{ability:"Förmågor",tradition:"Traditioner",power:"Krafter",ritual:"Ritualer",trait:"Särdrag",monstrous:"Monstruösa särdrag",boon:"Fördelar",burden:"Nackdelar"},
+books:{GB:"Grundbok",SH:"Spelarens handbok",MK:"Monsterkodex",KORT:"Förmågekort"},
+saveErr:"Kunde inte spara till kontot. Ändringen finns kvar i den här webbläsaren.",
+xpCostHint:"Kostnad",
+},
+en:{account:"Account",signedInAs:"Signed in as",signOut:"Sign out",changePw:"Change password",newPw:"New password (at least 8 characters)",pwShort:"The password must be at least 8 characters",pwChanged:"Password changed",
+loginTitle:"Sign in",loginHint:"Use the email and password you got from whoever runs the app.",email:"Email",password:"Password",signIn:"Sign in",badLogin:"Wrong email or password.",noNet:"No internet connection.",
+rulesErr:"The rules data could not be loaded. Check your connection and reload the page.",offline:"Could not reach the server. Changes are kept on this device and sync when you're back online.",
+install:"Install as an app",installHint:"iPhone/iPad: open the page in Safari, tap Share and choose Add to Home Screen. Computer: click the install icon in the address bar in Chrome or Edge. Sign in once in the installed app.",
+navChars:"Characters",navLib:"Library",navSettings:"Settings",back:"Back",loading:"Loading…",
+newChar:"New character",noChars:"No characters yet. Create your first one.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",color:"Colour",
+save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",add:"Add",close:"Close",confirmDel:"Delete {x}? This cannot be undone.",
+tOverview:"Overview",tAbilities:"Abilities",tCombat:"Combat",tGear:"Gear",tNotes:"Notes",
+attributes:"Attributes",attrSum:"Total {n} of 80",
+accurate:"Accurate",cunning:"Cunning",discreet:"Discreet",persuasive:"Persuasive",quick:"Quick",resolute:"Resolute",strong:"Strong",vigilant:"Vigilant",
+toughness:"Toughness",pain:"Pain Threshold",defense:"Defense",corrThr:"Corruption Threshold",abomThr:"Abomination Threshold",
+current:"Now",damage:"Damage",tempCorr:"Temporary corruption",permCorr:"Permanent corruption",totalCorr:"Total corruption",
+derived:"Secondary attributes",modifier:"Adjustment",
+xp:"Experience",xpTotal:"Total",xpSpent:"Spent",xpLeft:"Left",xpHint:"Total including the 50 you start with. Spent is calculated from abilities, powers, rituals, boons and burdens.",
+secAbilities:"Abilities & traditions",secMystic:"Mystical powers & rituals",secTraits:"Traits, boons & burdens",
+addAbility:"Add ability",addMystic:"Add power/ritual",addTrait:"Add trait",
+none:"Nothing added.",free:"Free (not counted in experience)",remove:"Remove from character",level:"Level",
+novice:"Novice",adept:"Adept",master:"Master",
+weapons:"Weapons",armors:"Armour",newWeapon:"New weapon",newArmor:"New armour",dmg:"Damage",quality:"Qualities",attr:"Attribute",mainW:"Main weapon",worn:"Worn",
+prot:"Armour value",impede:"Impeding",impedeHint:"Defense penalty, e.g. −2",
+gear:"Gear",newItem:"New item",cost:"Cost",note:"Note",money:"Money",daler:"Thaler",skilling:"Shilling",ortug:"Ortegs",
+notes:"Notes",newNote:"New note",noteHint:"Write a note…",
+search:"Search name or text",all:"All",sort:"Sort",sortName:"Name",sortGroup:"Group",sortBook:"Book",typ:"Type",tradition:"Tradition",book:"Book",arche:"Archetype",
+results:"{n} results",added:"{x} added",already:"Already added",onlyFor:"Only for {x}",material:"Material",race_:"Race",
+showLang:"Show",both:"Both",
+settings:"Settings",language:"Language",storage:"Storage",synced:"Saved and synced with your account.",localOnly:"Saved in this browser only. Open the page signed in to claude.ai to sync.",connecting:"Connecting…",
+backup:"Backup",exportBtn:"Save backup (.json)",copyBtn:"Copy as text",importBtn:"Load backup",importPaste:"Paste backup",importDone:"{n} characters loaded",importBad:"Could not read that file. Is it a backup from this app?",copied:"Copied",
+dataTitle:"About the rules data",dataBody:"312 entries from the Core Rulebook, Advanced Player's Guide, Monster Codex and ability cards, in Swedish and English. Checked against Mega symbaroum: Exorcize added in Swedish (was missing), Terrify cleaned of mixed-in text, name typos fixed, PDF hyphenation removed.",
+exportDone:"Backup saved",exportFail:"The download was cancelled. Use Copy as text instead.",
+types:{ability:"Ability",tradition:"Tradition",power:"Power",ritual:"Ritual",trait:"Trait",monstrous:"Monstrous trait",boon:"Boon",burden:"Burden"},
+typesP:{ability:"Abilities",tradition:"Traditions",power:"Powers",ritual:"Rituals",trait:"Traits",monstrous:"Monstrous traits",boon:"Boons",burden:"Burdens"},
+books:{GB:"Core Rulebook",SH:"Advanced Player's Guide",MK:"Monster Codex",KORT:"Ability cards"},
+saveErr:"Could not save to your account. The change is kept in this browser.",
+xpCostHint:"Cost",
+}};
+const TRAD_EN={"Ordensmagi":"Wizardry","Häxkonster":"Witchcraft","Svartkonst":"Sorcery","Teurgi":"Theurgy","Symbolism":"Symbolism","Stavmagi":"Staff Magic","Trollsång":"Troll Singing"};
+const ARCH_EN={"Krigare":"Warrior","Mystiker":"Mystic","Tjuv":"Rogue","Jägare":"Hunter","Järnsvuren":"Iron Sworn","Templár":"Templar","Artefaktmakare":"Artifact Crafter","Vredesgardist":"Wrath Guard","Gentlemannatjuv":"Gentleman Thief","Drottningspion":"Queen's Spy"};
+const SPEC_EN={"Demonolog":"Demonologist","Nekromantiker":"Necromancer","Pyromantiker":"Pyromancer","Illusionist":"Illusionist","Mentalist":"Mentalist","Inkvisitor":"Inquisitor","Själasörjare":"Confessor","Grönvävare":"Green Weaver","Blodvadare":"Blood Wader","Andebesvärjare":"Spiritualist","Andebevärjare":"Spiritualist","Stavmagiker":"Staff Mage"};
+const RACE_EN={"resar":"ogres","svartalf":"dark elves","bortbyting":"changelings","alver":"elves","dvärgar":"dwarves"};
+const TRADS=["Ordensmagi","Häxkonster","Svartkonst","Teurgi","Symbolism","Stavmagi","Trollsång"];
+const ARCHES=["Krigare","Mystiker","Tjuv","Jägare"];
+const ATTRS=["accurate","cunning","discreet","persuasive","quick","resolute","strong","vigilant"];
+const COLORS=["#c0614a","#d0a14a","#8fa776","#5f9e9a","#6f86c4","#9a6fb0","#c4708f","#a59a85"];
+const SECTIONS={abilities:["ability","tradition"],mystic:["power","ritual"],traits:["trait","monstrous","boon","burden"]};
+
+let lang="sv";
+try{ lang=localStorage.getItem("sym.lang")||"sv"; }catch(e){}
+const t=(k,v)=>{let s=STR[lang][k]??STR.sv[k]??k; if(v) for(const x in v) s=s.replace("{"+x+"}",v[x]); return s;};
+const tr=x=>lang==="en"?(TRAD_EN[x]||x):x;
+const ar=x=>lang==="en"?(ARCH_EN[x]||x):x;
+const sp=x=>lang==="en"?(SPEC_EN[x]||x):x;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const paras=s=>esc(s).split(/\n+/).map(p=>`<p>${p}</p>`).join("");
+
+/* ---------- rules data ---------- */
+let DATA=[], BYID={};
+const L=(e,l=lang)=>e[l]||e.sv;
+const nameOf=e=>L(e).name;
+const hasLevels=e=>e.type!=="ritual" && !!(e.sv.novice||e.en.novice);
+function costOf(e,o){ if(o.free) return 0;
+  if(hasLevels(e)) return [0,10,30,60][o.level||1];
+  return {ritual:10,boon:5,burden:-5,trait:0,monstrous:10}[e.type]??0; }
+function groupLine(e){
+  const bits=[];
+  if(e.specialization) bits.push(t("onlyFor",{x:sp(e.specialization)}));
+  else if(e.traditions.length && e.type!=="tradition") bits.push(e.traditions.map(tr).join(", "));
+  if(e.type==="ability" && e.archetypes.length) bits.push((e.onlyArchetype?t("onlyFor",{x:e.archetypes.map(ar).join(", ")}):e.archetypes.map(ar).join(", ")));
+  if(e.race) bits.push(t("race_")+": "+(lang==="en"?(RACE_EN[e.race]||e.race):e.race));
+  return bits.join(" · ");
+}
+function bookLine(e){ return (STR[lang].books[e.book]||e.book)+(e.ref?" · "+e.ref:""); }
+
+/* ---------- state + storage (Supabase) ---------- */
+const S={chars:[], view:"chars", charId:null, sub:"overview", syncState:"connecting", user:null};
+const sb=window.supabase.createClient(window.SYM_CONFIG.url, window.SYM_CONFIG.key, {auth:{persistSession:true,autoRefreshToken:true}});
+const dirty=new Set(); const writing={}; const timers={};
+const lkey=()=>"sym.chars."+(S.user?S.user.id:"anon");
+function loadLocal(){ try{ const j=JSON.parse(localStorage.getItem(lkey())||"[]"); S.chars=Array.isArray(j)?j:[]; }catch(e){ S.chars=[]; } S.chars.forEach(normChar); }
+function saveLocal(){ try{ localStorage.setItem(lkey(),JSON.stringify(S.chars)); }catch(e){} }
+const uidGen=()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function blankChar(){ return {id:uidGen(),name:"",race:"",archetype:"",occupation:"",color:COLORS[0],
+  attrs:{accurate:10,cunning:10,discreet:10,persuasive:10,quick:10,resolute:10,strong:10,vigilant:10},
+  mods:{toughness:0,pain:0,defense:0,corrThr:0}, damage:0, tempCorr:0, permCorr:0, xpTotal:50,
+  abilities:[], weapons:[], armors:[], gear:[], money:{daler:0,skilling:0,ortug:0}, notes:[], created:Date.now(), updated:Date.now()}; }
+function normChar(c){ const b=blankChar(); for(const k in b) if(c[k]===undefined) c[k]=b[k];
+  for(const k of ATTRS) if(c.attrs[k]===undefined) c.attrs[k]=10; for(const k in b.mods) if(c.mods[k]===undefined) c.mods[k]=0; return c; }
+function touch(c){ c.updated=Date.now(); saveLocal(); queueRemote(c); }
+function queueRemote(c){ dirty.add(c.id); saveDirty(); clearTimeout(timers[c.id]); timers[c.id]=setTimeout(()=>flush(c.id),700); }
+function saveDirty(){ try{ localStorage.setItem(lkey()+".dirty",JSON.stringify([...dirty])); }catch(e){} }
+function loadDirty(){ try{ JSON.parse(localStorage.getItem(lkey()+".dirty")||"[]").forEach(id=>dirty.add(id)); }catch(e){} }
+async function flush(id){
+  if(!S.user) return;
+  if(writing[id]){ timers[id]=setTimeout(()=>flush(id),400); return; }
+  const c=S.chars.find(x=>x.id===id); writing[id]=true;
+  try{
+    const r=c? await sb.from("characters").upsert({id:c.id,user_id:S.user.id,data:c,updated_at:new Date(c.updated).toISOString()})
+             : await sb.from("characters").delete().eq("id",id);
+    if(r.error) throw r.error;
+    dirty.delete(id); saveDirty(); setSync("synced");
+  }catch(e){ setSync("offline"); timers[id]=setTimeout(()=>flush(id),15000); }
+  finally{ writing[id]=false; }
+}
+let pulling=false;
+async function pull(){
+  if(!S.user||pulling) return; pulling=true;
+  try{
+    const r=await sb.from("characters").select("id,data,updated_at"); if(r.error) throw r.error;
+    const remote={}; r.data.forEach(row=>remote[row.id]=row.data);
+    const merged=[]; const seen=new Set();
+    for(const id in remote){ seen.add(id); const loc=S.chars.find(c=>c.id===id);
+      if(loc && (dirty.has(id) || (loc.updated||0)>(remote[id].updated||0))){ merged.push(loc); queueRemote(loc); }
+      else merged.push(normChar(remote[id])); }
+    // characters only in this device: upload if pending, otherwise they were deleted elsewhere
+    S.chars.forEach(c=>{ if(!seen.has(c.id) && dirty.has(c.id)){ merged.push(c); queueRemote(c); } });
+    [...dirty].forEach(id=>{ if(!S.chars.find(c=>c.id===id)) flush(id); });
+    const before=JSON.stringify(S.chars); S.chars=merged.sort((a,b)=>(a.created||0)-(b.created||0));
+    saveLocal(); setSync("synced");
+    if(JSON.stringify(S.chars)!==before && !document.querySelector("#layer .scrim") && !isTyping()) render();
+  }catch(e){ setSync("offline"); }
+  finally{ pulling=false; }
+}
+async function loadRules(){
+  let cached=null; try{ cached=JSON.parse(localStorage.getItem("sym.rules")||"null"); }catch(e){}
+  if(cached&&cached.length) setRules(cached);
+  try{
+    const out=[]; for(let from=0;;from+=1000){ const r=await sb.from("rules").select("data").range(from,from+999); if(r.error) throw r.error; out.push(...r.data.map(x=>x.data)); if(r.data.length<1000) break; }
+    if(out.length){ setRules(out); try{ localStorage.setItem("sym.rules",JSON.stringify(out)); }catch(e){} }
+  }catch(e){ if(!cached) throw e; }
+}
+function setRules(d){ DATA=d; BYID={}; d.forEach(e=>BYID[e.id]=e); }
+function setSync(s){ S.syncState=s; refreshStatus(); }
+const isTyping=()=>{const a=document.activeElement; return a && /INPUT|TEXTAREA|SELECT/.test(a.tagName);};
+function refreshStatus(){ const el=document.getElementById("syncStatus"); if(el) el.innerHTML=statusHtml(); }
+function statusHtml(){ const s=S.syncState; return `<span class="dot ${s==="synced"?"ok":s==="offline"?"warn":""}"></span><span>${s==="synced"?t("synced"):s==="offline"?t("offline"):t("connecting")}</span>`; }
+
+/* ---------- derived values ---------- */
+function derived(c){
+  const a=c.attrs, m=c.mods; const worn=c.armors.filter(x=>x.worn);
+  const imp=worn.reduce((s,x)=>s+(parseInt(x.impede)||0),0);
+  const tough=Math.max(a.strong,10)+(m.toughness||0);
+  const spent=c.abilities.reduce((s,o)=>{const e=BYID[o.ref]; return s+(e?costOf(e,o):0);},0);
+  return {tough, pain:Math.ceil(a.strong/2)+(m.pain||0), def:a.quick+imp+(m.defense||0), imp,
+    corrThr:Math.ceil(a.resolute/2)+(m.corrThr||0), abom:a.resolute, spent, left:(c.xpTotal||0)-spent,
+    sum:ATTRS.reduce((s,k)=>s+(+a[k]||0),0), totalCorr:(c.permCorr||0)+(c.tempCorr||0)};
+}
+
+/* ---------- rendering ---------- */
+const $=s=>document.querySelector(s);
+function setTitle(txt,back){ $("#title").textContent=txt; $("#backBtn").hidden=!back; }
+function applyStaticT(){ document.querySelectorAll("[data-t]").forEach(el=>el.textContent=t(el.dataset.t));
+  $("#langSv").setAttribute("aria-pressed",lang==="sv"); $("#langEn").setAttribute("aria-pressed",lang==="en");
+  document.documentElement.lang=lang; $("#backBtn").setAttribute("aria-label",t("back")); }
+function render(){
+  applyStaticT();
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",(b.dataset.nav===S.view||(S.view==="char"&&b.dataset.nav==="chars"))?"page":"false"));
+  const m=$("#main");
+  if(S.view==="chars") m.innerHTML=viewChars();
+  else if(S.view==="char") m.innerHTML=viewChar();
+  else if(S.view==="lib") m.innerHTML=viewLib();
+  else if(S.view==="settings") m.innerHTML=viewSettings();
+  if(S.view==="lib") bindPicker(m,null);
+}
+function viewChars(){
+  setTitle(t("navChars"),false);
+  const items=S.chars.map(c=>{const d=derived(c);
+    return `<button class="charitem" style="--c:${esc(c.color)}" data-act="open" data-id="${c.id}">
+      <div><h3>${esc(c.name||"—")}</h3><div class="meta">${esc([c.race,c.archetype,c.occupation].filter(Boolean).join(" · "))}</div></div>
+      <div class="xp">${t("toughness")} ${d.tough-(c.damage||0)}/${d.tough}<br>${t("xpLeft")} ${d.left}</div></button>`;}).join("");
+  return `<div class="stack">${S.chars.length?`<div class="charlist">${items}</div>`:`<div class="empty">${t("noChars")}</div>`}
+    <div><button class="btn primary" data-act="newChar">+ ${t("newChar")}</button></div></div>`;
+}
+function cur(){ return S.chars.find(c=>c.id===S.charId); }
+function viewChar(){
+  const c=cur(); if(!c){ S.view="chars"; return viewChars(); }
+  setTitle(c.name||"—",true);
+  const subs=[["overview","tOverview"],["abilities","tAbilities"],["combat","tCombat"],["gear","tGear"],["notes","tNotes"]];
+  const head=`<div class="row"><div class="hero" style="--c:${esc(c.color)};flex:1"><h2>${esc(c.name||"—")}</h2>
+    <div class="muted">${esc([c.race,c.archetype,c.occupation].filter(Boolean).join(" · "))}</div></div>
+    <button class="btn sm" data-act="editChar">${t("edit")}</button></div>
+    <div class="subtabs" role="group">${subs.map(([k,l])=>`<button data-act="sub" data-sub="${k}" aria-pressed="${S.sub===k}">${t(l)}</button>`).join("")}</div>`;
+  let body="";
+  if(S.sub==="overview") body=subOverview(c);
+  else if(S.sub==="abilities") body=subAbilities(c);
+  else if(S.sub==="combat") body=subCombat(c);
+  else if(S.sub==="gear") body=subGear(c);
+  else body=subNotes(c);
+  return `<div class="stack">${head}${body}</div>`;
+}
+function stepper(field,val,extra=""){ return `<span class="stepper"><button data-act="step" data-f="${field}" data-d="-1" aria-label="−">−</button><input class="num" inputmode="numeric" data-in="${field}" value="${esc(val)}" ${extra} aria-label="${field}"><button data-act="step" data-f="${field}" data-d="1" aria-label="+">+</button></span>`; }
+function subOverview(c){
+  const d=derived(c); const hp=d.tough-(c.damage||0); const pct=Math.max(0,Math.min(100,hp/d.tough*100));
+  const cp=Math.min(100,d.totalCorr/Math.max(1,d.abom)*100);
+  const sumCls=d.sum===80?"ok":"warn";
+  const tile=(k,v,f,mod)=>`<div class="tile"><div class="k">${t(k)}</div><div class="v" data-d="${k}">${v}</div><div class="f">${f}</div>
+     <label class="f small" style="margin-top:6px">${t("modifier")}${stepper("mods."+mod,c.mods[mod]||0)}</label></div>`;
+  return `
+  <div class="card stack">
+    <div class="track"><span class="lbl">${t("toughness")}</span><span class="val" data-d="hp">${hp} / ${d.tough}</span>
+      <div class="bar"><i data-d="hpbar" style="width:${pct}%"></i></div>
+      <span class="small muted">${t("damage")}</span>${stepper("damage",c.damage||0,'min="0"')}</div>
+    <div class="track"><span class="lbl">${t("totalCorr")}</span><span class="val" data-d="corr">${d.totalCorr}</span>
+      <div class="bar cor"><i data-d="corrbar" style="width:${cp}%"></i></div>
+      <span class="small muted">${t("tempCorr")}</span>${stepper("tempCorr",c.tempCorr||0)}
+      <span class="small muted">${t("permCorr")}</span>${stepper("permCorr",c.permCorr||0)}</div>
+  </div>
+  <div class="card stack"><div class="sec-head"><h3>${t("attributes")}</h3><span class="pill ${sumCls}" data-d="sum">${t("attrSum",{n:d.sum})}</span></div>
+    <div class="attrs">${ATTRS.map(k=>`<div class="attr"><span class="name">${t(k)}</span>${stepper("attrs."+k,c.attrs[k])}</div>`).join("")}</div></div>
+  <div class="card stack"><h3>${t("derived")}</h3><div class="tiles">
+    ${tile("toughness",d.tough,`max(${t("strong")}, 10)`,"toughness")}
+    ${tile("pain",d.pain,`${t("strong")} ÷ 2`,"pain")}
+    ${tile("defense",d.def,`${t("quick")}${d.imp?` ${d.imp}`:""}`,"defense")}
+    ${tile("corrThr",d.corrThr,`${t("resolute")} ÷ 2`,"corrThr")}
+    <div class="tile"><div class="k">${t("abomThr")}</div><div class="v" data-d="abomThr">${d.abom}</div><div class="f">= ${t("resolute")}</div></div>
+  </div></div>
+  <div class="card stack"><h3>${t("xp")}</h3>
+    <div class="tiles">
+      <div class="tile"><div class="k">${t("xpTotal")}</div>${stepper("xpTotal",c.xpTotal||0)}</div>
+      <div class="tile"><div class="k">${t("xpSpent")}</div><div class="v" data-d="spent">${d.spent}</div></div>
+      <div class="tile"><div class="k">${t("xpLeft")}</div><div class="v" data-d="left" style="color:${d.left<0?"var(--bad)":"inherit"}">${d.left}</div></div>
+    </div><p class="small muted" style="margin:0">${t("xpHint")}</p></div>`;
+}
+function ownedList(c,types){
+  const rows=c.abilities.map((o,i)=>({o,i,e:BYID[o.ref]})).filter(x=>x.e&&types.includes(x.e.type))
+    .sort((a,b)=>nameOf(a.e).localeCompare(nameOf(b.e),lang));
+  if(!rows.length) return `<div class="empty small">${t("none")}</div>`;
+  return `<div class="owned">${rows.map(({o,i,e})=>`<button class="item" data-act="ownedDetail" data-i="${i}">
+     <div><div class="nm">${esc(nameOf(e))}</div><div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""}</div></div>
+     <div class="right">${hasLevels(e)?`<span class="pill lv">${t(["","novice","adept","master"][o.level||1])}</span>`:""}<span class="pill num">${o.free?"0":costOf(e,o)} XP</span></div></button>`).join("")}</div>`;
+}
+function subAbilities(c){
+  const sec=(key,title,addKey)=>`<div class="stack"><div class="sec-head"><h3>${t(title)}</h3><button class="btn sm" data-act="pick" data-sec="${key}">+ ${t(addKey)}</button></div>${ownedList(c,SECTIONS[key])}</div>`;
+  return sec("abilities","secAbilities","addAbility")+sec("mystic","secMystic","addMystic")+sec("traits","secTraits","addTrait");
+}
+function subCombat(c){
+  const w=c.weapons.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${x.main?"★ ":""}${esc(x.name||"—")}</div>
+    <div class="sub">${t("dmg")} ${esc(x.dmg||"—")} · ${esc(x.attr?t(x.attr):"")}${x.quality?" · "+esc(x.quality):""}</div></div>
+    <button class="btn sm" data-act="editW" data-i="${i}">${t("edit")}</button></div>`).join("");
+  const a=c.armors.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${x.worn?"◆ ":""}${esc(x.name||"—")}</div>
+    <div class="sub">${t("prot")} ${esc(x.prot||"—")} · ${t("impede")} ${esc(x.impede||0)}${x.quality?" · "+esc(x.quality):""}</div></div>
+    <button class="btn sm" data-act="editA" data-i="${i}">${t("edit")}</button></div>`).join("");
+  const d=derived(c);
+  return `<div class="tiles"><div class="tile"><div class="k">${t("defense")}</div><div class="v">${d.def}</div></div>
+    <div class="tile"><div class="k">${t("toughness")}</div><div class="v">${d.tough-(c.damage||0)} / ${d.tough}</div></div>
+    <div class="tile"><div class="k">${t("pain")}</div><div class="v">${d.pain}</div></div></div>
+  <div class="stack"><div class="sec-head"><h3>${t("weapons")}</h3><button class="btn sm" data-act="editW" data-i="-1">+ ${t("newWeapon")}</button></div>
+    ${w?`<div class="list-plain">${w}</div>`:`<div class="empty small">${t("none")}</div>`}</div>
+  <div class="stack"><div class="sec-head"><h3>${t("armors")}</h3><button class="btn sm" data-act="editA" data-i="-1">+ ${t("newArmor")}</button></div>
+    ${a?`<div class="list-plain">${a}</div>`:`<div class="empty small">${t("none")}</div>`}</div>`;
+}
+function subGear(c){
+  const g=c.gear.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${esc(x.name||"—")}</div>
+    <div class="sub">${x.cost?esc(x.cost):""}${x.cost&&x.note?" · ":""}${esc(x.note||"")}</div></div>
+    <button class="btn sm" data-act="editG" data-i="${i}">${t("edit")}</button></div>`).join("");
+  return `<div class="card stack"><h3>${t("money")}</h3><div class="tiles">
+    ${["daler","skilling","ortug"].map(k=>`<div class="tile"><div class="k">${t(k)}</div>${stepper("money."+k,c.money[k]||0)}</div>`).join("")}</div></div>
+    <div class="stack"><div class="sec-head"><h3>${t("gear")}</h3><button class="btn sm" data-act="editG" data-i="-1">+ ${t("newItem")}</button></div>
+    ${g?`<div class="list-plain">${g}</div>`:`<div class="empty small">${t("none")}</div>`}</div>`;
+}
+function subNotes(c){
+  const n=[...c.notes].map((x,i)=>({x,i})).reverse().map(({x,i})=>`<div class="entry"><div class="grow"><div class="note-date">${new Date(x.date).toLocaleDateString(lang==="en"?"en-GB":"sv-SE")}</div>
+    <div class="sub" style="color:var(--text);white-space:pre-wrap">${esc(x.text)}</div></div><button class="btn sm" data-act="editN" data-i="${i}">${t("edit")}</button></div>`).join("");
+  return `<div class="stack"><div class="sec-head"><h3>${t("notes")}</h3><button class="btn sm" data-act="editN" data-i="-1">+ ${t("newNote")}</button></div>
+    ${n?`<div class="list-plain">${n}</div>`:`<div class="empty small">${t("none")}</div>`}</div>`;
+}
+function viewLib(){ setTitle(t("navLib"),false); return pickerHtml(null); }
+function viewSettings(){
+  setTitle(t("settings"),false);
+  return `<div class="stack">
+  <div class="card stack"><h3>${t("language")}</h3><div class="seg" role="group"><button data-act="lang" data-l="sv" aria-pressed="${lang==="sv"}">Svenska</button><button data-act="lang" data-l="en" aria-pressed="${lang==="en"}">English</button></div></div>
+  <div class="card stack"><h3>${t("account")}</h3><div class="small">${t("signedInAs")} <b>${esc(S.user?S.user.email:"")}</b></div>
+    <div class="status" id="syncStatus">${statusHtml()}</div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="changePw">${t("changePw")}</button><button class="btn danger" data-act="signOut">${t("signOut")}</button></div></div>
+  <div class="card stack"><h3>${t("install")}</h3><p class="small muted" style="margin:0">${t("installHint")}</p></div>
+  <div class="card stack"><h3>${t("backup")}</h3>
+    <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="export">${t("exportBtn")}</button><button class="btn" data-act="copyAll">${t("copyBtn")}</button></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="import">${t("importBtn")}</button><button class="btn ghost" data-act="pasteImport">${t("importPaste")}</button></div></div>
+  <div class="card stack"><h3>${t("dataTitle")}</h3><p class="small muted" style="margin:0">${t("dataBody")}</p></div></div>`;
+}
+/* ---------- picker (used for adding and for the library) ---------- */
+const P={q:"",type:"all",group:"all",book:"all",sort:"name",sec:null};
+function pickerTypes(sec){ return sec?SECTIONS[sec]:["ability","tradition","power","ritual","trait","monstrous","boon","burden"]; }
+function pickerHtml(sec){
+  const types=pickerTypes(sec);
+  const chip=(k,v,l)=>`<button data-pf="${k}" data-v="${esc(v)}" aria-pressed="${P[k]===v}">${esc(l)}</button>`;
+  const showTrad=sec==="mystic"||(!sec&&["all","power","ritual","tradition"].includes(P.type));
+  const showArch=sec==="abilities"||(!sec&&P.type==="ability");
+  let groupRow="";
+  if(showTrad) groupRow=`<div class="chips"><span class="lab">${t("tradition")}</span>${chip("group","all",t("all"))}${TRADS.map(x=>chip("group",x,tr(x))).join("")}</div>`;
+  else if(showArch) groupRow=`<div class="chips"><span class="lab">${t("arche")}</span>${chip("group","all",t("all"))}${ARCHES.map(x=>chip("group",x,ar(x))).join("")}</div>`;
+  return `<div class="filters" style="margin:${sec?"0":"-16px -16px 0"}">
+    <input class="t" type="search" id="pq" placeholder="${t("search")}" value="${esc(P.q)}" aria-label="${t("search")}">
+    ${types.length>1?`<div class="chips"><span class="lab">${t("typ")}</span>${chip("type","all",t("all"))}${types.map(x=>chip("type",x,STR[lang].typesP[x])).join("")}</div>`:""}
+    ${groupRow}
+    <div class="chips"><span class="lab">${t("book")}</span>${chip("book","all",t("all"))}${["GB","SH","MK","KORT"].map(x=>chip("book",x,STR[lang].books[x])).join("")}</div>
+    <div class="row small"><span class="muted" id="pcount"></span><label class="row muted" style="margin-left:auto;gap:6px">${t("sort")}
+      <select class="t" id="psort" style="width:auto;padding:4px 8px">${[["name","sortName"],["group","sortGroup"],["book","sortBook"]].map(([v,l])=>`<option value="${v}" ${P.sort===v?"selected":""}>${t(l)}</option>`).join("")}</select></label></div>
+  </div><div class="results" id="pres" style="${sec?"padding:0 16px":""}"></div>`;
+}
+function groupKey(e){
+  if(e.type==="power"||e.type==="ritual"||e.type==="tradition") return e.specialization?tr(e.traditions[0])+" – "+sp(e.specialization):(e.traditions.map(tr).join(", ")||"—");
+  if(e.type==="ability") return e.archetypes.length?e.archetypes.map(ar).join(", "):"—";
+  return STR[lang].typesP[e.type];
+}
+function filterData(sec){
+  const types=pickerTypes(sec); const q=P.q.trim().toLowerCase();
+  let r=DATA.filter(e=>types.includes(e.type)&&(P.type==="all"||e.type===P.type)&&(P.book==="all"||e.book===P.book));
+  if(P.group!=="all") r=r.filter(e=>e.traditions.includes(P.group)||e.archetypes.includes(P.group));
+  if(q) r=r.filter(e=>{ const a=nameOf(e).toLowerCase(); if(a.includes(q)) return true;
+      const s=[e.sv,e.en].map(x=>[x.name,x.desc,x.novice,x.adept,x.master].join(" ")).join(" ").toLowerCase(); return s.includes(q); })
+    .sort((a,b)=>(nameOf(b).toLowerCase().includes(q))-(nameOf(a).toLowerCase().includes(q)));
+  const byName=(a,b)=>nameOf(a).localeCompare(nameOf(b),lang);
+  if(!q||P.sort!=="name"){
+    if(P.sort==="name") r.sort(byName);
+    else if(P.sort==="group") r.sort((a,b)=>groupKey(a).localeCompare(groupKey(b),lang)||byName(a,b));
+    else r.sort((a,b)=>a.book.localeCompare(b.book)||byName(a,b));
+  }
+  return r;
+}
+function renderResults(root,sec){
+  const r=filterData(sec); const c=sec?cur():null;
+  root.querySelector("#pcount").textContent=t("results",{n:r.length});
+  let html="", last=null;
+  for(const e of r.slice(0,400)){
+    if(P.sort!=="name"&&!P.q.trim()){ const g=P.sort==="group"?groupKey(e):STR[lang].books[e.book]; if(g!==last){ html+=`<div class="grouphead">${esc(g)}</div>`; last=g; } }
+    const has=c&&c.abilities.some(o=>o.ref===e.id);
+    html+=`<button class="res" data-act="detail" data-id="${e.id}"><div><div class="nm">${esc(nameOf(e))}</div>
+      <div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""} · ${esc(bookLine(e))}</div></div>
+      ${has?`<span class="right pill ok">✓</span>`:""}</button>`;
+  }
+  root.querySelector("#pres").innerHTML=html||`<div class="empty small" style="margin-top:12px">—</div>`;
+}
+function bindPicker(root,sec){
+  renderResults(root,sec);
+  const q=root.querySelector("#pq"); q.addEventListener("input",()=>{P.q=q.value; renderResults(root,sec);});
+  root.querySelector("#psort").addEventListener("change",ev=>{P.sort=ev.target.value; renderResults(root,sec);});
+  root.querySelectorAll("[data-pf]").forEach(b=>b.addEventListener("click",()=>{
+    P[b.dataset.pf]=b.dataset.v; if(b.dataset.pf==="type") P.group="all";
+    const html=pickerHtml(sec); const holder=sec?root.querySelector(".pickwrap"):root; const keepQ=P.q;
+    holder.innerHTML=html; P.q=keepQ; bindPicker(root,sec); }));
+}
+function openPicker(sec){
+  P.sec=sec; P.type="all"; P.group="all"; P.q=""; P.sort=sec==="mystic"?"group":"name";
+  const title={abilities:"addAbility",mystic:"addMystic",traits:"addTrait"}[sec];
+  const el=sheet(`<div class="sheet-head"><h2>${t(title)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
+    <div class="sheet-body" style="padding:0"><div class="pickwrap">${pickerHtml(sec)}</div></div>`,{tall:true});
+  bindPicker(el,sec);
+  el.addEventListener("click",ev=>{ const b=ev.target.closest('[data-act="detail"]'); if(b) openDetail(b.dataset.id); });
+}
+
+/* ---------- ability detail ---------- */
+let detailLang=null;
+function detailHtml(e,owned){
+  const dl=detailLang||lang;
+  const pick=(f)=>{ if(dl==="both"){ const a=e.sv[f], b=e.en[f]; if(!a&&!b) return ""; return `<div class="cmp"><span class="tag">SV</span>${paras(a||"—")}<span class="tag">EN</span><div class="en">${paras(b||"—")}</div></div>`; }
+    const v=(e[dl]||e.sv)[f]; return v?paras(v):""; };
+  const title=dl==="both"?`${e.sv.name} / ${e.en.name}`:L(e,dl).name;
+  const levels=hasLevels(e)?[1,2,3].map(n=>{const f=["","novice","adept","master"][n]; const on=owned&&(owned.level||1)>=n;
+     return `<div class="lvl ${on?"on":""}"><h4>${t(f)} ${on?`<span class="pill lv">✓</span>`:""}</h4>${pick(f)}</div>`;}).join(""):"";
+  const extra=(e.sv.extra&&dl!=="en")?`<div class="lvl"><h4>${lang==="en"?"Expanded (APG)":"Utökning (SH)"}</h4>${paras(e.sv.extra)}</div>`:"";
+  return `<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"><span class="pill">${esc(STR[lang].types[e.type])}</span>${groupLine(e)?`<span class="pill">${esc(groupLine(e))}</span>`:""}<span class="pill">${esc(bookLine(e))}</span></div>
+   <div class="row" style="margin-bottom:12px"><span class="small muted">${t("showLang")}</span><div class="seg" role="group">
+     ${[["sv","SV"],["en","EN"],["both",t("both")]].map(([v,l])=>`<button data-dl="${v}" aria-pressed="${dl===v}">${l}</button>`).join("")}</div></div>
+   <h3 style="font-size:1.3rem;margin-bottom:8px">${esc(title)}</h3>
+   ${(e.sv.material||e.en.material)?`<p class="small"><b>${t("material")}:</b> ${esc(dl==="en"?e.en.material:e.sv.material)}</p>`:""}
+   <div class="detail">${pick("desc")}${levels}${extra}</div>`;
+}
+function openDetail(id,ownedIdx){
+  const e=BYID[id]; if(!e) return; detailLang=null;
+  const c=S.view==="char"?cur():null;
+  const ownedI=ownedIdx!=null?ownedIdx:(c?c.abilities.findIndex(o=>o.ref===id):-1);
+  const owned=ownedI>=0?c.abilities[ownedI]:null;
+  const inAdd=!!document.querySelector("#layer .pickwrap");
+  const foot=()=>{
+    if(!c) return "";
+    if(owned){ const lvBtns=hasLevels(e)?`<div class="seg" role="group" style="margin-right:auto">${[1,2,3].map(n=>`<button data-setlv="${n}" aria-pressed="${(owned.level||1)===n}">${t(["","novice","adept","master"][n])}</button>`).join("")}</div>`:"";
+      return `${lvBtns}<label class="row small muted" style="gap:6px"><input type="checkbox" id="freeChk" ${owned.free?"checked":""}> ${t("free")}</label>
+        <button class="btn danger sm" data-remove>${t("remove")}</button>`; }
+    if(!inAdd) return "";
+    if(hasLevels(e)) return [1,2,3].map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="${n}">+ ${t(["","novice","adept","master"][n])} <span class="small">(${[0,10,30,60][n]})</span></button>`).join("");
+    return `<button class="btn primary" data-addlv="0">+ ${t("add")} <span class="small">(${costOf(e,{})} XP)</span></button>`;
+  };
+  const el=sheet(`<div class="sheet-head"><h2>${esc(nameOf(e))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
+    <div class="sheet-body" id="dbody">${detailHtml(e,owned)}</div>${foot()?`<div class="sheet-foot">${foot()}</div>`:""}`,{tall:true,stack:true});
+  el.addEventListener("click",ev=>{
+    const b=ev.target.closest("button,input"); if(!b) return;
+    if(b.dataset.dl){ detailLang=b.dataset.dl; el.querySelector("#dbody").innerHTML=detailHtml(e,owned); return; }
+    if(b.dataset.addlv!==undefined){ c.abilities.push({ref:e.id,level:+b.dataset.addlv||1}); touch(c); closeTop(); toast(t("added",{x:nameOf(e)}));
+      const pw=document.querySelector("#layer .pickwrap"); if(pw) renderResults(pw.closest(".sheet"),P.sec); render(); return; }
+    if(b.dataset.setlv){ owned.level=+b.dataset.setlv; touch(c); el.querySelectorAll("[data-setlv]").forEach(x=>x.setAttribute("aria-pressed",x===b)); el.querySelector("#dbody").innerHTML=detailHtml(e,owned); render(); return; }
+    if(b.id==="freeChk"){ owned.free=b.checked; touch(c); render(); return; }
+    if(b.dataset.remove!==undefined){ c.abilities.splice(ownedI,1); touch(c); closeTop(); render(); return; }
+  });
+}
+
+/* ---------- sheets (modals) ---------- */
+function sheet(inner,opt={}){
+  const layer=$("#layer"); if(!opt.stack) layer.innerHTML="";
+  const sc=document.createElement("div"); sc.className="scrim";
+  sc.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" style="${opt.tall?"height:92%":""}">${inner}</div>`;
+  sc.addEventListener("click",ev=>{ if(ev.target===sc||ev.target.closest("[data-close]")) closeTop(); });
+  layer.appendChild(sc); const f=sc.querySelector("input.t,textarea.t"); if(f&&opt.focus) setTimeout(()=>f.focus(),50);
+  return sc;
+}
+function closeTop(){ const l=$("#layer"); if(l.lastElementChild) l.lastElementChild.remove(); }
+function closeAll(){ $("#layer").innerHTML=""; }
+let toastT; function toast(msg){ let el=document.querySelector(".toast"); if(!el){ el=document.createElement("div"); el.className="toast"; el.setAttribute("role","status"); document.body.appendChild(el);} el.textContent=msg; clearTimeout(toastT); toastT=setTimeout(()=>el.remove(),2200); }
+function confirmSheet(msg,onYes){
+  const el=sheet(`<div class="sheet-body"><p style="margin:4px 0 0">${esc(msg)}</p></div><div class="sheet-foot"><button class="btn" data-close>${t("cancel")}</button><button class="btn danger" id="yes">${t("del")}</button></div>`,{stack:true});
+  el.querySelector("#yes").onclick=()=>{ closeTop(); onYes(); };
+}
+function formSheet(title,fields,vals,onSave,onDelete){
+  const f=fields.map(([k,l,type,opts])=>{
+    const v=vals[k]??"";
+    if(type==="check") return `<label class="row small"><input type="checkbox" id="f_${k}" ${v?"checked":""}> ${esc(l)}</label>`;
+    if(type==="select") return `<label class="f" for="f_${k}">${esc(l)}<select class="t" id="f_${k}">${opts.map(([ov,ol])=>`<option value="${esc(ov)}" ${v===ov?"selected":""}>${esc(ol)}</option>`).join("")}</select></label>`;
+    if(type==="area") return `<label class="f" for="f_${k}">${esc(l)}<textarea class="t" id="f_${k}">${esc(v)}</textarea></label>`;
+    if(type==="color") return `<div class="f"><span>${esc(l)}</span><div class="swatches" id="f_${k}" data-v="${esc(v)}">${COLORS.map(cl=>`<button type="button" style="background:${cl}" data-c="${cl}" aria-label="${cl}" aria-pressed="${v===cl}"></button>`).join("")}</div></div>`;
+    return `<label class="f" for="f_${k}">${esc(l)}<input class="t" id="f_${k}" value="${esc(v)}" ${type==="num"?'inputmode="numeric"':""} placeholder="${esc(opts||"")}"></label>`;
+  }).join("");
+  const el=sheet(`<div class="sheet-head"><h2>${esc(title)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
+    <form class="sheet-body stack" id="fs">${f}</form>
+    <div class="sheet-foot">${onDelete?`<button class="btn danger" id="fdel" style="margin-right:auto">${t("del")}</button>`:""}<button class="btn" data-close>${t("cancel")}</button><button class="btn primary" id="fsave">${t("save")}</button></div>`,{focus:true});
+  el.querySelectorAll(".swatches button").forEach(b=>b.onclick=()=>{ const w=b.parentElement; w.dataset.v=b.dataset.c; w.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); });
+  const collect=()=>{ const o={}; fields.forEach(([k,,type])=>{ const n=el.querySelector("#f_"+k);
+      o[k]=type==="check"?n.checked:type==="color"?n.dataset.v:n.value; }); return o; };
+  const doSave=()=>{ onSave(collect()); closeTop(); };
+  el.querySelector("#fsave").onclick=doSave;
+  el.querySelector("#fs").addEventListener("submit",ev=>{ev.preventDefault(); doSave();});
+  if(onDelete) el.querySelector("#fdel").onclick=()=>onDelete();
+}
+function editCharSheet(c){
+  const isNew=!c; const v=c||blankChar();
+  formSheet(isNew?t("newChar"):t("edit"),[["name",t("name"),"text"],["race",t("race"),"text"],["archetype",t("archetype"),"text"],["occupation",t("occupation"),"text"],["color",t("color"),"color"]],v,
+   o=>{ Object.assign(v,o); if(isNew){ S.chars.push(v); S.charId=v.id; S.view="char"; S.sub="overview"; } touch(v); render(); },
+   isNew?null:()=>confirmSheet(t("confirmDel",{x:v.name||"—"}),()=>{ S.chars=S.chars.filter(x=>x!==v); saveLocal(); dirty.add(v.id); saveDirty(); flush(v.id); closeAll(); S.view="chars"; render(); }));
+}
+function listEdit(c,key,i,title,fields,blank){
+  const isNew=i<0; const v=isNew?{...blank}:c[key][i];
+  formSheet(title,fields,v,o=>{ Object.assign(v,o);
+      if(key==="weapons"&&v.main) c.weapons.forEach(w=>{ if(w!==v) w.main=false; });
+      if(isNew) c[key].push(v); touch(c); render(); },
+    isNew?null:()=>confirmSheet(t("confirmDel",{x:v.name||t("note")}),()=>{ c[key].splice(i,1); touch(c); closeAll(); render(); }));
+}
+
+/* ---------- events ---------- */
+document.getElementById("tabs").addEventListener("click",ev=>{ const b=ev.target.closest("[data-nav]"); if(!b) return; S.view=b.dataset.nav; if(S.view==="lib") Object.assign(P,{q:"",type:"all",group:"all",book:"all",sort:"name",sec:null}); closeAll(); render(); $("#main").scrollTop=0; });
+$("#backBtn").onclick=()=>{ S.view="chars"; render(); };
+const setLang=l=>{ lang=l; try{localStorage.setItem("sym.lang",l);}catch(e){} closeAll(); if(S.user) render(); else showLogin(); };
+$("#langSv").onclick=()=>setLang("sv"); $("#langEn").onclick=()=>setLang("en");
+$("#main").addEventListener("click",ev=>{
+  const b=ev.target.closest("[data-act]"); if(!b) return; const act=b.dataset.act; const c=cur();
+  if(act==="open"){ S.charId=b.dataset.id; S.view="char"; S.sub="overview"; render(); $("#main").scrollTop=0; }
+  else if(act==="newChar") editCharSheet(null);
+  else if(act==="editChar") editCharSheet(c);
+  else if(act==="sub"){ S.sub=b.dataset.sub; render(); }
+  else if(act==="step"){ const f=b.dataset.f; const inp=b.parentElement.querySelector("input"); setField(c,f,(parseInt(inp.value)||0)+(+b.dataset.d)); inp.value=getField(c,f); updateDerived(c); }
+  else if(act==="pick") openPicker(b.dataset.sec);
+  else if(act==="ownedDetail"){ const o=c.abilities[+b.dataset.i]; openDetail(o.ref,+b.dataset.i); }
+  else if(act==="detail") openDetail(b.dataset.id);
+  else if(act==="editW") listEdit(c,"weapons",+b.dataset.i,t(+b.dataset.i<0?"newWeapon":"weapons"),
+      [["name",t("name"),"text"],["dmg",t("dmg"),"text","1T8"],["quality",t("quality"),"text"],["attr",t("attr"),"select",ATTRS.map(k=>[k,t(k)])],["main",t("mainW"),"check"]],{name:"",dmg:"",quality:"",attr:"accurate",main:false});
+  else if(act==="editA") listEdit(c,"armors",+b.dataset.i,t(+b.dataset.i<0?"newArmor":"armors"),
+      [["name",t("name"),"text"],["prot",t("prot"),"text","1T4"],["impede",t("impede"),"num",t("impedeHint")],["quality",t("quality"),"text"],["worn",t("worn"),"check"]],{name:"",prot:"",impede:"",quality:"",worn:true});
+  else if(act==="editG") listEdit(c,"gear",+b.dataset.i,t(+b.dataset.i<0?"newItem":"gear"),[["name",t("name"),"text"],["cost",t("cost"),"text"],["note",t("note"),"text"]],{name:"",cost:"",note:""});
+  else if(act==="editN"){ const i=+b.dataset.i; listEdit(c,"notes",i,t(i<0?"newNote":"note"),[["text",t("note"),"area"]],{text:"",date:Date.now()}); }
+  else if(act==="lang") setLang(b.dataset.l);
+  else if(act==="export") doExport();
+  else if(act==="copyAll") copyAll(b);
+  else if(act==="import") $("#fileIn").click();
+  else if(act==="pasteImport") pasteImport();
+  else if(act==="signOut") signOut();
+  else if(act==="changePw") changePw();
+});
+function getField(c,f){ const [a,b]=f.split("."); return b?c[a][b]:c[a]; }
+function setField(c,f,v){ const [a,b]=f.split("."); if(f==="damage"||f.startsWith("money")||f==="tempCorr"||f==="permCorr") v=Math.max(0,v); if(f.startsWith("attrs")) v=Math.max(0,Math.min(25,v));
+  if(b) c[a][b]=v; else c[a]=v; touch(c); }
+$("#main").addEventListener("input",ev=>{ const f=ev.target.dataset.in; if(!f) return; const c=cur(); const n=parseInt(ev.target.value); if(isNaN(n)) return; setField(c,f,n); updateDerived(c); });
+$("#main").addEventListener("change",ev=>{ const f=ev.target.dataset.in; if(!f) return; ev.target.value=getField(cur(),f); });
+function updateDerived(c){
+  const d=derived(c); const set=(k,v)=>{ const el=document.querySelector(`[data-d="${k}"]`); if(el) el.textContent=v; };
+  set("hp",`${d.tough-(c.damage||0)} / ${d.tough}`); set("toughness",d.tough); set("pain",d.pain); set("defense",d.def); set("corrThr",d.corrThr); set("abomThr",d.abom);
+  set("corr",d.totalCorr); set("spent",d.spent); set("left",d.left); set("sum",t("attrSum",{n:d.sum}));
+  const s=document.querySelector('[data-d="sum"]'); if(s) s.className="pill "+(d.sum===80?"ok":"warn");
+  const l=document.querySelector('[data-d="left"]'); if(l) l.style.color=d.left<0?"var(--bad)":"inherit";
+  const hb=document.querySelector('[data-d="hpbar"]'); if(hb) hb.style.width=Math.max(0,Math.min(100,(d.tough-(c.damage||0))/d.tough*100))+"%";
+  const cb=document.querySelector('[data-d="corrbar"]'); if(cb) cb.style.width=Math.min(100,d.totalCorr/Math.max(1,d.abom)*100)+"%";
+}
+/* backup */
+const backupText=()=>JSON.stringify({app:"symbaroum-rollpersoner",version:1,exported:new Date().toISOString(),characters:S.chars},null,1);
+function doExport(){
+  try{ const blob=new Blob([backupText()],{type:"application/json"}); const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download="symbaroum-rollpersoner-"+new Date().toISOString().slice(0,10)+".json";
+    document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000); toast(t("exportDone")); }
+  catch(e){ toast(t("exportFail")); }
+}
+async function copyAll(){ try{ await navigator.clipboard.writeText(backupText()); toast(t("copied")); }catch(e){ showText(); } }
+function showText(){ const el=sheet(`<div class="sheet-head"><h2>${t("backup")}</h2><button class="iconbtn" data-close>✕</button></div><div class="sheet-body"><textarea class="t" style="min-height:50vh" readonly>${esc(backupText())}</textarea></div>`); el.querySelector("textarea").select(); }
+function importText(txt){
+  try{ const j=JSON.parse(txt); const list=Array.isArray(j)?j:j.characters; if(!Array.isArray(list)) throw 0;
+    let n=0; list.forEach(c=>{ if(!c||typeof c!=="object") return; normChar(c); const i=S.chars.findIndex(x=>x.id===c.id); if(i>=0) S.chars[i]=c; else S.chars.push(c); touch(c); n++; });
+    toast(t("importDone",{n})); closeAll(); render(); }
+  catch(e){ toast(t("importBad")); }
+}
+$("#fileIn").addEventListener("change",async ev=>{ const f=ev.target.files[0]; if(f) importText(await f.text()); ev.target.value=""; });
+function pasteImport(){ const el=sheet(`<div class="sheet-head"><h2>${t("importPaste")}</h2><button class="iconbtn" data-close>✕</button></div><div class="sheet-body"><textarea class="t" id="pt" style="min-height:40vh"></textarea></div><div class="sheet-foot"><button class="btn" data-close>${t("cancel")}</button><button class="btn primary" id="pgo">${t("importBtn")}</button></div>`,{focus:true});
+  el.querySelector("#pgo").onclick=()=>importText(el.querySelector("#pt").value); }
+
+/* ---------- login + boot ---------- */
+function showLogin(err){
+  document.getElementById("tabs").hidden=true; setTitle("Symbaroum",false); applyStaticT();
+  $("#main").innerHTML=`<form class="card stack" id="loginForm" style="max-width:420px;margin:8vh auto 0">
+    <h2 style="font-size:1.5rem">${t("loginTitle")}</h2><p class="small muted" style="margin:0">${t("loginHint")}</p>
+    <label class="f" for="lgEmail">${t("email")}<input class="t" id="lgEmail" type="email" autocomplete="username" required></label>
+    <label class="f" for="lgPw">${t("password")}<input class="t" id="lgPw" type="password" autocomplete="current-password" required></label>
+    <p class="small" id="lgErr" style="color:var(--bad);margin:0" ${err?"":"hidden"}>${esc(err||"")}</p>
+    <button class="btn primary" type="submit" id="lgBtn">${t("signIn")}</button></form>`;
+  $("#loginForm").addEventListener("submit",async ev=>{ ev.preventDefault(); const b=$("#lgBtn"); b.disabled=true; b.textContent=t("loading");
+    const {error}=await sb.auth.signInWithPassword({email:$("#lgEmail").value.trim(),password:$("#lgPw").value});
+    if(error){ b.disabled=false; b.textContent=t("signIn"); const e=$("#lgErr"); e.hidden=false; e.textContent=/invalid/i.test(error.message)?t("badLogin"):(navigator.onLine?error.message:t("noNet")); } });
+}
+async function startSession(user){
+  if(S.user&&S.user.id===user.id) return;
+  S.user=user; document.getElementById("tabs").hidden=false; dirty.clear(); loadDirty(); loadLocal();
+  $("#main").innerHTML=`<p class="muted">${t("loading")}</p>`;
+  try{ await loadRules(); }catch(e){ $("#main").innerHTML=`<div class="empty">${t("rulesErr")}</div>`; return; }
+  S.view="chars"; render(); pull();
+}
+async function signOut(){ await sb.auth.signOut(); S.user=null; S.chars=[]; closeAll(); showLogin(); }
+function changePw(){
+  formSheet(t("changePw"),[["pw",t("newPw"),"text"]],{pw:""},async o=>{
+    if((o.pw||"").length<8){ toast(t("pwShort")); return; }
+    const {error}=await sb.auth.updateUser({password:o.pw}); toast(error?error.message:t("pwChanged")); });
+  const inp=document.querySelector("#f_pw"); if(inp){ inp.type="password"; inp.autocomplete="new-password"; }
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") pull(); });
+window.addEventListener("online",()=>{ pull(); });
+applyStaticT();
+sb.auth.getSession().then(({data})=>{ if(data.session) startSession(data.session.user); else showLogin(); });
+sb.auth.onAuthStateChange((ev,session)=>{ if(session&&session.user) startSession(session.user); else if(ev==="SIGNED_OUT"){ S.user=null; showLogin(); } });
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
