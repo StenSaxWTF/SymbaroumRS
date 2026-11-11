@@ -124,6 +124,23 @@ textarea.t{min-height:90px;resize:vertical}
 .chips button{flex:none;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:.86rem;color:var(--muted)}
 .chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .chips .lab{flex:none;align-self:center;font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-right:2px}
+/* mouse/trackpad: no horizontal swipe, so let filter rows and sub-tabs wrap instead of hiding chips */
+@media (hover:hover) and (pointer:fine){ .chips,.subtabs{flex-wrap:wrap;overflow:visible} }
+/* install drawer */
+details.drawer{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+details.drawer>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px}
+details.drawer>summary::-webkit-details-marker{display:none}
+details.drawer>summary h3{flex:1}
+details.drawer>summary .chev{color:var(--muted);transition:transform .2s;font-size:1.1rem}
+details.drawer[open]>summary .chev{transform:rotate(90deg)}
+details.drawer>summary .hint{font-size:.85rem;color:var(--muted)}
+details.drawer[open]>summary .hint{visibility:hidden}
+.drawer-body{padding:0 14px 14px;display:flex;flex-direction:column;gap:12px}
+.plat{border-top:1px solid var(--line);padding-top:12px}
+.plat h4{margin:0 0 6px;font-family:var(--display);font-weight:500;font-size:1.02rem;display:flex;gap:8px;align-items:center}
+.plat ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:3px}
+.plat .tip{margin:6px 0 0;font-size:.85rem;color:var(--muted)}
+.plat kbd{font:inherit;font-weight:700;background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:0 5px}
 .results{display:flex;flex-direction:column}
 .res{display:flex;align-items:center;gap:10px;background:none;border:0;border-bottom:1px solid var(--line);padding:11px 2px;text-align:left;width:100%}
 .res .nm{font-weight:500}
@@ -480,6 +497,30 @@ function subNotes(c){
     ${n?`<div class="list-plain">${n}</div>`:`<div class="empty small">${t("none")}</div>`}</div>`;
 }
 function viewLib(){ setTitle(t("navLib"),false); return pickerHtml(null); }
+const INSTALL={
+sv:{intro:"Lägg appen på hemskärmen eller i datorn så öppnas den i ett eget fönster, som en vanlig app. Logga in en gång i den installerade appen – den har en egen inloggning, skild från webbläsaren.",
+ show:"Visa instruktioner",
+ plats:[
+  {t:"iPhone och iPad",tag:"Safari",steps:["Öppna sidan i <b>Safari</b>.","Tryck på <kbd>Dela</kbd> (fyrkanten med en pil uppåt).","Välj <b>Lägg till på hemskärmen</b> och tryck på <b>Lägg till</b>."],tip:"Fungerar också i Chrome på iPhone: tryck på Dela i adressfältet och välj Lägg till på hemskärmen."},
+  {t:"Android",tag:"Chrome",steps:["Öppna sidan i <b>Chrome</b>.","Tryck på menyn <kbd>⋮</kbd> uppe till höger.","Välj <b>Installera app</b> (på vissa telefoner heter det <b>Lägg till på startskärmen</b>) och bekräfta."]},
+  {t:"Android",tag:"Firefox",steps:["Öppna sidan i <b>Firefox</b>.","Tryck på menyn <kbd>⋮</kbd> (uppe eller nere till höger, beroende på var du har adressfältet).","Välj <b>Lägg till på startskärmen</b> (kan heta <b>Installera</b>) och bekräfta."]},
+  {t:"Dator",tag:"Chrome eller Edge",steps:["Öppna sidan.","Klicka på installera-ikonen längst till höger i adressfältet (en skärm med en pil).","Klicka på <b>Installera</b>."],tip:"Syns ingen ikon? Chrome: menyn ⋮ → Spara och dela → Installera sidan som app. Edge: menyn … → Appar → Installera den här webbplatsen som en app."},
+  {t:"Dator",tag:"Firefox",steps:["Firefox på dator kan inte installera webbappar ännu.","Använd Chrome eller Edge för att installera, eller högerklicka på fliken i Firefox och välj <b>Fäst flik</b> så ligger appen alltid kvar längst till vänster."]}
+ ]},
+en:{intro:"Put the app on your home screen or computer and it opens in its own window, like a regular app. Sign in once in the installed app – it has its own login, separate from the browser.",
+ show:"Show instructions",
+ plats:[
+  {t:"iPhone and iPad",tag:"Safari",steps:["Open the page in <b>Safari</b>.","Tap <kbd>Share</kbd> (the square with an arrow pointing up).","Choose <b>Add to Home Screen</b> and tap <b>Add</b>."],tip:"Also works in Chrome on iPhone: tap Share in the address bar and choose Add to Home Screen."},
+  {t:"Android",tag:"Chrome",steps:["Open the page in <b>Chrome</b>.","Tap the <kbd>⋮</kbd> menu at the top right.","Choose <b>Install app</b> (on some phones it's <b>Add to Home screen</b>) and confirm."]},
+  {t:"Android",tag:"Firefox",steps:["Open the page in <b>Firefox</b>.","Tap the <kbd>⋮</kbd> menu (top or bottom right, depending on where your address bar is).","Choose <b>Add to Home screen</b> (may be called <b>Install</b>) and confirm."]},
+  {t:"Computer",tag:"Chrome or Edge",steps:["Open the page.","Click the install icon at the right end of the address bar (a screen with an arrow).","Click <b>Install</b>."],tip:"No icon? Chrome: ⋮ menu → Cast, save and share → Install page as app. Edge: … menu → Apps → Install this site as an app."},
+  {t:"Computer",tag:"Firefox",steps:["Firefox on desktop can't install web apps yet.","Use Chrome or Edge to install, or right-click the tab in Firefox and choose <b>Pin Tab</b> so the app always stays at the far left."]}
+ ]}};
+function installDrawer(){ const I=INSTALL[lang];
+  return `<details class="drawer"><summary><h3>${t("install")}</h3><span class="hint">${I.show}</span><span class="chev" aria-hidden="true">›</span></summary>
+   <div class="drawer-body"><p class="small muted" style="margin:0">${I.intro}</p>
+   ${I.plats.map(p=>`<div class="plat"><h4>${p.t} <span class="pill">${p.tag}</span></h4><ol>${p.steps.map(x=>`<li>${x}</li>`).join("")}</ol>${p.tip?`<p class="tip">${p.tip}</p>`:""}</div>`).join("")}
+   </div></details>`; }
 function viewSettings(){
   setTitle(t("settings"),false);
   return `<div class="stack">
@@ -487,7 +528,7 @@ function viewSettings(){
   <div class="card stack"><h3>${t("account")}</h3><div class="small">${t("signedInAs")} <b>${esc(S.user?S.user.email:"")}</b></div>
     <div class="status" id="syncStatus">${statusHtml()}</div>
     <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="changePw">${t("changePw")}</button><button class="btn danger" data-act="signOut">${t("signOut")}</button></div></div>
-  <div class="card stack"><h3>${t("install")}</h3><p class="small muted" style="margin:0">${t("installHint")}</p></div>
+  ${installDrawer()}
   <div class="card stack"><h3>${t("backup")}</h3>
     <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="export">${t("exportBtn")}</button><button class="btn" data-act="copyAll">${t("copyBtn")}</button></div>
     <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="import">${t("importBtn")}</button><button class="btn ghost" data-act="pasteImport">${t("importPaste")}</button></div></div>

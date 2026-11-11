@@ -1,6 +1,6 @@
 // Caches the app itself so it opens fast and works offline.
 // Rules and characters are not cached here; the app keeps its own copy on the device.
-const CACHE = "symbaroum-v2";
+const CACHE = "symbaroum-v3";
 const SHELL = ["./", "./index.html", "./config.js", "./vendor/supabase.js", "./manifest.webmanifest",
                "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
