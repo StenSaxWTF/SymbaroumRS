@@ -739,7 +739,7 @@ async function startSession(user){
   if(S.user&&S.user.id===user.id) return;
   S.user=user; document.getElementById("tabs").hidden=false; dirty.clear(); loadDirty(); loadLocal();
   $("#main").innerHTML=`<p class="muted">${t("loading")}</p>`;
-  try{ await loadRules(); }catch(e){ $("#main").innerHTML=`<div class="empty">${t("rulesErr")}</div>`; return; }
+  try{ await loadRules(); }catch(e){ $("#main").innerHTML=`<div class="empty">${t("rulesErr")}<br><span class="small">${esc((e&&(e.message||e.code))||String(e))}</span><br><br><button class="btn" onclick="location.reload()">${lang==="en"?"Reload":"Ladda om"}</button></div>`; return; }
   S.view="chars"; render(); pull();
 }
 async function signOut(){ await sb.auth.signOut(); S.user=null; S.chars=[]; closeAll(); showLogin(); }
