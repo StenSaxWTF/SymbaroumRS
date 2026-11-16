@@ -93,6 +93,13 @@ nav.tabs button[aria-current="page"] svg{color:var(--accent)}
 .dv .name{white-space:normal}
 .av .num,.dv .num{font-family:var(--display);font-size:1.45rem;line-height:1.1}
 .modtag{position:absolute;top:3px;right:5px;font-size:.68rem;color:var(--accent)}
+.qrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.qchip{background:rgba(192,97,74,.12);border:1px solid #6a3a32;color:var(--text);border-radius:999px;padding:2px 10px;font-size:.85rem}
+.qchip.sm{font-size:.78rem;padding:1px 8px}
+.linkname{background:none;border:0;padding:0;color:inherit;font:inherit;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;text-align:left}
+.kvs{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.95rem}
+.kv{display:contents}.kv>span:first-child{color:var(--muted)}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
 .sub-h{font-family:var(--display);font-size:1rem;color:var(--muted);margin-top:2px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
 .tile{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:10px}
@@ -206,7 +213,7 @@ details.drawer[open]>summary .hint{visibility:hidden}
 "use strict";
 /* ---------- i18n ---------- */
 const STR={
-sv:{done:"Klar",editStats:"Ändra värden",strongGift:"Stark gåva",ranks:"Antal gånger",account:"Konto",signedInAs:"Inloggad som",signOut:"Logga ut",changePw:"Byt lösenord",newPw:"Nytt lösenord (minst 8 tecken)",pwShort:"Lösenordet måste vara minst 8 tecken",pwChanged:"Lösenordet är bytt",
+sv:{fromList:"Välj från listan",customW:"Eget vapen",customA:"Egen rustning",customG:"Egen sak",pickW:"Lägg till vapen",pickA:"Lägg till rustning",pickG:"Lägg till utrustning",payChk:"Dra kostnaden från pengarna",paid:"{x} tillagd, {y} dragna",noMoney:"Pengarna räcker inte – {x} lades till utan att dra något",inUse:"Används (räknas i Försvar)",requires:"Kräver",blackMarket:"Endast svarta marknaden",withQual:"Föremål med kvaliteten",category:"Kategori",kind:"Slag",applies:"Gäller",svOnly:"Finns bara på svenska",info:"Visa beskrivning",qkind:{Positiv:"Positiv",Negativ:"Negativ",Mystisk:"Mystisk"},done:"Klar",editStats:"Ändra värden",strongGift:"Stark gåva",ranks:"Antal gånger",account:"Konto",signedInAs:"Inloggad som",signOut:"Logga ut",changePw:"Byt lösenord",newPw:"Nytt lösenord (minst 8 tecken)",pwShort:"Lösenordet måste vara minst 8 tecken",pwChanged:"Lösenordet är bytt",
 loginTitle:"Logga in",loginHint:"Använd e-post och lösenord som du fått av den som driver appen.",email:"E-post",password:"Lösenord",signIn:"Logga in",badLogin:"Fel e-post eller lösenord.",noNet:"Ingen internetanslutning.",
 rulesErr:"Regeldata kunde inte laddas. Kontrollera anslutningen och ladda om sidan.",offline:"Kunde inte nå servern. Ändringar sparas på enheten och synkas när du är online igen.",
 install:"Installera som app",installHint:"iPhone/iPad: öppna sidan i Safari, tryck på Dela och välj Lägg till på hemskärmen. Dator: klicka på installera-ikonen i adressfältet i Chrome eller Edge. Logga in en gång i den installerade appen.",
@@ -235,13 +242,13 @@ settings:"Inställningar",language:"Språk",storage:"Lagring",synced:"Sparat och
 backup:"Säkerhetskopia",exportBtn:"Spara säkerhetskopia (.json)",copyBtn:"Kopiera som text",importBtn:"Läs in säkerhetskopia",importPaste:"Klistra in säkerhetskopia",importDone:"{n} rollpersoner inlästa",importBad:"Det gick inte att läsa filen. Är det en säkerhetskopia från den här appen?",copied:"Kopierat",
 dataTitle:"Om regeldata",dataBody:"312 poster från Grundbok, Spelarens handbok, Monsterkodex och förmågekort, på svenska och engelska. Rättat mot Mega symbaroum: Förvisning tillagd (saknades), Skräckslå rensad från inblandad text, stavfel i namn rättade, avstavningar från PDF borttagna.",
 exportDone:"Säkerhetskopian sparad",exportFail:"Nedladdningen avbröts. Använd Kopiera som text i stället.",
-types:{ability:"Förmåga",tradition:"Tradition",power:"Kraft",ritual:"Ritual",trait:"Särdrag",monstrous:"Monstruöst särdrag",boon:"Fördel",burden:"Nackdel"},
-typesP:{ability:"Förmågor",tradition:"Traditioner",power:"Krafter",ritual:"Ritualer",trait:"Särdrag",monstrous:"Monstruösa särdrag",boon:"Fördelar",burden:"Nackdelar"},
+types:{ability:"Förmåga",tradition:"Tradition",power:"Kraft",ritual:"Ritual",trait:"Särdrag",monstrous:"Monstruöst särdrag",boon:"Fördel",burden:"Nackdel",weapon:"Vapen",armor:"Rustning",quality:"Kvalitet",gear:"Utrustning"},
+typesP:{ability:"Förmågor",tradition:"Traditioner",power:"Krafter",ritual:"Ritualer",trait:"Särdrag",monstrous:"Monstruösa särdrag",boon:"Fördelar",burden:"Nackdelar",weapon:"Vapen",armor:"Rustningar",quality:"Kvaliteter",gear:"Utrustning"},
 books:{GB:"Grundbok",SH:"Spelarens handbok",MK:"Monsterkodex",KORT:"Förmågekort"},
 saveErr:"Kunde inte spara till kontot. Ändringen finns kvar i den här webbläsaren.",
 xpCostHint:"Kostnad",
 },
-en:{done:"Done",editStats:"Edit values",strongGift:"Strong Gift",ranks:"Times taken",account:"Account",signedInAs:"Signed in as",signOut:"Sign out",changePw:"Change password",newPw:"New password (at least 8 characters)",pwShort:"The password must be at least 8 characters",pwChanged:"Password changed",
+en:{fromList:"Choose from the list",customW:"Custom weapon",customA:"Custom armour",customG:"Custom item",pickW:"Add weapon",pickA:"Add armour",pickG:"Add equipment",payChk:"Deduct the cost from money",paid:"{x} added, {y} deducted",noMoney:"Not enough money – {x} was added without deducting anything",inUse:"In use (counts for Defense)",requires:"Requires",blackMarket:"Black market only",withQual:"Items with this quality",category:"Category",kind:"Kind",applies:"Applies to",svOnly:"Only available in Swedish",info:"Show description",qkind:{Positiv:"Positive",Negativ:"Negative",Mystisk:"Mystical"},done:"Done",editStats:"Edit values",strongGift:"Strong Gift",ranks:"Times taken",account:"Account",signedInAs:"Signed in as",signOut:"Sign out",changePw:"Change password",newPw:"New password (at least 8 characters)",pwShort:"The password must be at least 8 characters",pwChanged:"Password changed",
 loginTitle:"Sign in",loginHint:"Use the email and password you got from whoever runs the app.",email:"Email",password:"Password",signIn:"Sign in",badLogin:"Wrong email or password.",noNet:"No internet connection.",
 rulesErr:"The rules data could not be loaded. Check your connection and reload the page.",offline:"Could not reach the server. Changes are kept on this device and sync when you're back online.",
 install:"Install as an app",installHint:"iPhone/iPad: open the page in Safari, tap Share and choose Add to Home Screen. Computer: click the install icon in the address bar in Chrome or Edge. Sign in once in the installed app.",
@@ -270,8 +277,8 @@ settings:"Settings",language:"Language",storage:"Storage",synced:"Saved and sync
 backup:"Backup",exportBtn:"Save backup (.json)",copyBtn:"Copy as text",importBtn:"Load backup",importPaste:"Paste backup",importDone:"{n} characters loaded",importBad:"Could not read that file. Is it a backup from this app?",copied:"Copied",
 dataTitle:"About the rules data",dataBody:"312 entries from the Core Rulebook, Advanced Player's Guide, Monster Codex and ability cards, in Swedish and English. Checked against Mega symbaroum: Exorcize added in Swedish (was missing), Terrify cleaned of mixed-in text, name typos fixed, PDF hyphenation removed.",
 exportDone:"Backup saved",exportFail:"The download was cancelled. Use Copy as text instead.",
-types:{ability:"Ability",tradition:"Tradition",power:"Power",ritual:"Ritual",trait:"Trait",monstrous:"Monstrous trait",boon:"Boon",burden:"Burden"},
-typesP:{ability:"Abilities",tradition:"Traditions",power:"Powers",ritual:"Rituals",trait:"Traits",monstrous:"Monstrous traits",boon:"Boons",burden:"Burdens"},
+types:{ability:"Ability",tradition:"Tradition",power:"Power",ritual:"Ritual",trait:"Trait",monstrous:"Monstrous trait",boon:"Boon",burden:"Burden",weapon:"Weapon",armor:"Armour",quality:"Quality",gear:"Equipment"},
+typesP:{ability:"Abilities",tradition:"Traditions",power:"Powers",ritual:"Rituals",trait:"Traits",monstrous:"Monstrous traits",boon:"Boons",burden:"Burdens",weapon:"Weapons",armor:"Armour",quality:"Qualities",gear:"Equipment"},
 books:{GB:"Core Rulebook",SH:"Advanced Player's Guide",MK:"Monster Codex",KORT:"Ability cards"},
 saveErr:"Could not save to your account. The change is kept in this browser.",
 xpCostHint:"Cost",
@@ -284,7 +291,8 @@ const TRADS=["Ordensmagi","Häxkonster","Svartkonst","Teurgi","Symbolism","Stavm
 const ARCHES=["Krigare","Mystiker","Tjuv","Jägare"];
 const ATTRS=["accurate","cunning","discreet","persuasive","quick","resolute","strong","vigilant"];
 const COLORS=["#c0614a","#d0a14a","#8fa776","#5f9e9a","#6f86c4","#9a6fb0","#c4708f","#a59a85"];
-const SECTIONS={abilities:["ability","tradition"],mystic:["power","ritual"],traits:["trait","monstrous","boon","burden"]};
+const SECTIONS={abilities:["ability","tradition"],mystic:["power","ritual"],traits:["trait","monstrous","boon","burden"],weapons:["weapon"],armors:["armor"],gear:["gear"]};
+const ITEM_SECS={weapons:"weapons",armors:"armors",gear:"gear"};
 
 let lang="sv";
 try{ lang=localStorage.getItem("sym.lang")||"sv"; }catch(e){}
@@ -300,6 +308,34 @@ let DATA=[], BYID={};
 const L=(e,l=lang)=>e[l]||e.sv;
 const nameOf=e=>L(e).name;
 const hasLevels=e=>e.type!=="ritual" && !!(e.sv.novice||e.en.novice);
+/* ---------- items: qualities, impeding, money ---------- */
+const ITEM_TYPES=["weapon","armor","quality","gear"];
+const isItem=e=>ITEM_TYPES.includes(e.type);
+let QIDX=null;
+function qualIndex(){ if(QIDX) return QIDX; QIDX={}; DATA.forEach(e=>{ if(e.type==="quality") QIDX[e.sv.name.toLowerCase()]=e; }); return QIDX; }
+function findQual(tok){
+  const q=qualIndex(); let k=tok.replace(/\(.*?\)/g,"").trim().toLowerCase(); if(!k) return null;
+  const tries=[k,k+"t",k.replace(/d$/,"t"),k.replace(/(ig|iv|is)$/,"$1t")];
+  for(const x of tries) if(q[x]) return q[x];
+  if(k.length>=5){ const hit=Object.keys(q).find(n=>n.startsWith(k.slice(0,5))); if(hit) return q[hit]; }
+  return null; }
+const qualTokens=str=>String(str||"").split(/,|\beller\b/).map(x=>x.trim()).filter(x=>x&&x!=="-");
+const hasQual=(str,name)=>qualTokens(str).some(x=>{const q=findQual(x); return q&&q.sv.name===name;});
+function qualChips(str,small){
+  return qualTokens(str).map(x=>{const q=findQual(x); return q?`<button class="qchip${small?" sm":""}" data-qual="${q.id}" title="${esc(q.sv.name)}">${esc(x)}</button>`:`<span class="pill">${esc(x)}</span>`;}).join(" "); }
+function calcImpede(str){
+  const m=String(str||"").match(/Begränsande\s*\(\s*[−-]\s*(\d)\s*\)/); if(!m) return 0;
+  let v=-(+m[1]); if(hasQual(str,"Smidigt")) v=Math.min(0,v+2); if(hasQual(str,"Otympligt")) v-=1; return v; }
+const COIN={daler:100,skilling:10,"örteg":1,"örtegar":1};
+function parseCost(str){ const m=String(str||"").replace(/\s(?=\d{3}\b)/g,"").match(/(\d+)\s*(daler|skilling|örtegar|örteg)/i); return m?(+m[1])*COIN[m[2].toLowerCase()]:null; }
+function fmtCoins(o){ const d=Math.floor(o/100), s=Math.floor(o%100/10), r=o%10; return [d?d+" "+t("daler").toLowerCase():"",s?s+" "+t("skilling").toLowerCase():"",r?r+" "+t("ortug").toLowerCase():""].filter(Boolean).join(", ")||"0"; }
+function payFor(c,cost){ const p=parseCost(cost); if(p==null) return {ok:true,amount:0};
+  const m=c.money; const tot=(m.daler||0)*100+(m.skilling||0)*10+(m.ortug||0); if(tot<p) return {ok:false};
+  const n=tot-p; m.daler=Math.floor(n/100); m.skilling=Math.floor(n%100/10); m.ortug=n%10; return {ok:true,amount:p}; }
+function itemLine(e){ const it=e.item||{};
+  if(e.type==="quality") return [t("qkind")[it.kind]||it.kind, it.applies].filter(Boolean).join(" · ");
+  if(e.type==="gear") return [it.cat, it.cost].filter(Boolean).join(" · ");
+  return [it.sub, it.dmg, it.quals&&it.quals!=="Speciell"?it.quals:"", it.cost].filter(Boolean).join(" · "); }
 /* boons whose text says they can be acquired several times (max three) */
 const maxRanks=e=>{ if(e._mr!==undefined) return e._mr;
   const txt=[e.sv.desc,e.sv.novice,e.en.desc,e.en.novice].join(" ");
@@ -375,7 +411,7 @@ async function loadRules(){
     if(out.length){ setRules(out); try{ localStorage.setItem("sym.rules",JSON.stringify(out)); }catch(e){} }
   }catch(e){ if(!cached) throw e; }
 }
-function setRules(d){ DATA=d; BYID={}; d.forEach(e=>BYID[e.id]=e); }
+function setRules(d){ DATA=d; BYID={}; QIDX=null; d.forEach(e=>BYID[e.id]=e); }
 function setSync(s){ S.syncState=s; refreshStatus(); }
 const isTyping=()=>{const a=document.activeElement; return a && /INPUT|TEXTAREA|SELECT/.test(a.tagName);};
 function refreshStatus(){ const el=document.getElementById("syncStatus"); if(el) el.innerHTML=statusHtml(); }
@@ -384,12 +420,13 @@ function statusHtml(){ const s=S.syncState; return `<span class="dot ${s==="sync
 /* ---------- derived values ---------- */
 function derived(c){
   const a=c.attrs, m=c.mods; const worn=c.armors.filter(x=>x.worn);
-  const imp=worn.reduce((s,x)=>s+(parseInt(x.impede)||0),0);
+  const imp=worn.reduce((s,x)=>s+(parseInt(String(x.impede).replace("−","-"))||0),0);
+  const bal=c.weapons.filter(w=>w.inUse&&hasQual(w.quality,"Balanserat")).length;
   const tough=Math.max(a.strong,10)+(m.toughness||0);
   const sg=c.abilities.find(o=>{const e=BYID[o.ref]; return e&&e.type==="ability"&&(e.sv.name==="Stark gåva"||e.en.name==="Strong Gift");});
   const strongGift=!!(sg&&(sg.level||1)>=2);
   const spent=c.abilities.reduce((s,o)=>{const e=BYID[o.ref]; return s+(e?costOf(e,o):0);},0);
-  return {tough, pain:Math.ceil(a.strong/2)+(m.pain||0), def:a.quick+imp+(m.defense||0), imp,
+  return {tough, pain:Math.ceil(a.strong/2)+(m.pain||0), def:a.quick+imp+bal+(m.defense||0), imp, bal,
     corrThr:(strongGift?a.resolute:Math.ceil(a.resolute/2))+(m.corrThr||0), abom:strongGift?a.resolute*2:a.resolute, strongGift, spent, left:(c.xpTotal||0)-spent,
     sum:ATTRS.reduce((s,k)=>s+(+a[k]||0),0), totalCorr:(c.permCorr||0)+(c.tempCorr||0)};
 }
@@ -466,7 +503,7 @@ function subOverview(c){
     <div class="${ed?"tiles":"dergrid"}">
     ${tile("toughness",d.tough,`max(${t("strong")}, 10)`,"toughness")}
     ${tile("pain",d.pain,`${t("strong")} ÷ 2`,"pain")}
-    ${tile("defense",d.def,`${t("quick")}${d.imp?` ${d.imp}`:""}`,"defense")}
+    ${tile("defense",d.def,`${t("quick")}${d.imp?` ${d.imp}`:""}${d.bal?` +${d.bal} (Balanserat)`:""}`,"defense")}
     ${tile("corrThr",d.corrThr,d.strongGift?`${t("resolute")} (${t("strongGift")})`:`${t("resolute")} ÷ 2`,"corrThr")}
     ${ed?`<div class="tile"><div class="k">${t("abomThr")}</div><div class="v" data-d="abomThr">${d.abom}</div><div class="f">${d.strongGift?`${t("resolute")} × 2 (${t("strongGift")})`:`= ${t("resolute")}`}</div></div>`
         :`<div class="dv"><span class="name">${t("abomThr")}</span><span class="num" data-d="abomThr">${d.abom}</span></div>`}
@@ -490,29 +527,32 @@ function subAbilities(c){
   const sec=(key,title,addKey)=>`<div class="stack"><div class="sec-head"><h3>${t(title)}</h3><button class="btn sm" data-act="pick" data-sec="${key}">+ ${t(addKey)}</button></div>${ownedList(c,SECTIONS[key])}</div>`;
   return sec("abilities","secAbilities","addAbility")+sec("mystic","secMystic","addMystic")+sec("traits","secTraits","addTrait");
 }
+function nameBtn(x){ return x.ref&&BYID[x.ref]?`<button class="linkname" data-act="itemInfo" data-ref="${x.ref}">${esc(x.name||"—")}</button>`:esc(x.name||"—"); }
 function subCombat(c){
-  const w=c.weapons.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${x.main?"★ ":""}${esc(x.name||"—")}</div>
-    <div class="sub">${t("dmg")} ${esc(x.dmg||"—")} · ${esc(x.attr?t(x.attr):"")}${x.quality?" · "+esc(x.quality):""}</div></div>
+  const w=c.weapons.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${x.main?"★ ":""}${nameBtn(x)}</div>
+    <div class="sub">${x.dmg?`${t("dmg")} ${esc(x.dmg)} · ${esc(x.attr?t(x.attr):"")}`:""}${x.inUse&&hasQual(x.quality,"Balanserat")?` · +1 ${t("defense")}`:""}</div>
+    ${x.quality?`<div class="qrow">${qualChips(x.quality,true)}</div>`:""}</div>
     <button class="btn sm" data-act="editW" data-i="${i}">${t("edit")}</button></div>`).join("");
-  const a=c.armors.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${x.worn?"◆ ":""}${esc(x.name||"—")}</div>
-    <div class="sub">${t("prot")} ${esc(x.prot||"—")} · ${t("impede")} ${esc(x.impede||0)}${x.quality?" · "+esc(x.quality):""}</div></div>
+  const a=c.armors.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${x.worn?"◆ ":""}${nameBtn(x)}</div>
+    <div class="sub">${t("prot")} ${esc(x.prot||"—")} · ${t("impede")} ${esc(x.impede||0)}</div>
+    ${x.quality?`<div class="qrow">${qualChips(x.quality,true)}</div>`:""}</div>
     <button class="btn sm" data-act="editA" data-i="${i}">${t("edit")}</button></div>`).join("");
   const d=derived(c);
   return `<div class="tiles"><div class="tile"><div class="k">${t("defense")}</div><div class="v">${d.def}</div></div>
     <div class="tile"><div class="k">${t("toughness")}</div><div class="v">${d.tough-(c.damage||0)} / ${d.tough}</div></div>
     <div class="tile"><div class="k">${t("pain")}</div><div class="v">${d.pain}</div></div></div>
-  <div class="stack"><div class="sec-head"><h3>${t("weapons")}</h3><button class="btn sm" data-act="editW" data-i="-1">+ ${t("newWeapon")}</button></div>
+  <div class="stack"><div class="sec-head"><h3>${t("weapons")}</h3><button class="btn sm" data-act="pick" data-sec="weapons">+ ${t("newWeapon")}</button></div>
     ${w?`<div class="list-plain">${w}</div>`:`<div class="empty small">${t("none")}</div>`}</div>
-  <div class="stack"><div class="sec-head"><h3>${t("armors")}</h3><button class="btn sm" data-act="editA" data-i="-1">+ ${t("newArmor")}</button></div>
+  <div class="stack"><div class="sec-head"><h3>${t("armors")}</h3><button class="btn sm" data-act="pick" data-sec="armors">+ ${t("newArmor")}</button></div>
     ${a?`<div class="list-plain">${a}</div>`:`<div class="empty small">${t("none")}</div>`}</div>`;
 }
 function subGear(c){
-  const g=c.gear.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${esc(x.name||"—")}</div>
+  const g=c.gear.map((x,i)=>`<div class="entry"><div class="grow"><div class="nm">${nameBtn(x)}</div>
     <div class="sub">${x.cost?esc(x.cost):""}${x.cost&&x.note?" · ":""}${esc(x.note||"")}</div></div>
     <button class="btn sm" data-act="editG" data-i="${i}">${t("edit")}</button></div>`).join("");
   return `<div class="card stack"><h3>${t("money")}</h3><div class="tiles">
     ${["daler","skilling","ortug"].map(k=>`<div class="tile"><div class="k">${t(k)}</div>${stepper("money."+k,c.money[k]||0)}</div>`).join("")}</div></div>
-    <div class="stack"><div class="sec-head"><h3>${t("gear")}</h3><button class="btn sm" data-act="editG" data-i="-1">+ ${t("newItem")}</button></div>
+    <div class="stack"><div class="sec-head"><h3>${t("gear")}</h3><button class="btn sm" data-act="pick" data-sec="gear">+ ${t("newItem")}</button></div>
     ${g?`<div class="list-plain">${g}</div>`:`<div class="empty small">${t("none")}</div>`}</div>`;
 }
 function subNotes(c){
@@ -561,7 +601,8 @@ function viewSettings(){
 }
 /* ---------- picker (used for adding and for the library) ---------- */
 const P={q:"",type:"all",group:"all",book:"all",sort:"name",sec:null};
-function pickerTypes(sec){ return sec?SECTIONS[sec]:["ability","tradition","power","ritual","trait","monstrous","boon","burden"]; }
+function pickerTypes(sec){ return sec?SECTIONS[sec]:["ability","tradition","power","ritual","trait","monstrous","boon","burden","weapon","armor","quality","gear"]; }
+function itemGroups(type){ const key=type==="gear"?"cat":type==="quality"?"kind":"sub"; const seen=[]; DATA.forEach(e=>{ if(e.type===type&&e.item&&e.item[key]&&!seen.includes(e.item[key])) seen.push(e.item[key]); }); return seen; }
 function pickerHtml(sec){
   const types=pickerTypes(sec);
   const chip=(k,v,l)=>`<button data-pf="${k}" data-v="${esc(v)}" aria-pressed="${P[k]===v}">${esc(l)}</button>`;
@@ -570,11 +611,14 @@ function pickerHtml(sec){
   let groupRow="";
   if(showTrad) groupRow=`<div class="chips"><span class="lab">${t("tradition")}</span>${chip("group","all",t("all"))}${TRADS.map(x=>chip("group",x,tr(x))).join("")}</div>`;
   else if(showArch) groupRow=`<div class="chips"><span class="lab">${t("arche")}</span>${chip("group","all",t("all"))}${ARCHES.map(x=>chip("group",x,ar(x))).join("")}</div>`;
+  const itemType=ITEM_SECS[sec]?SECTIONS[sec][0]:(!sec&&ITEM_TYPES.includes(P.type)?P.type:null);
+  if(itemType) groupRow=`<div class="chips"><span class="lab">${t(itemType==="quality"?"kind":"category")}</span>${chip("group","all",t("all"))}${itemGroups(itemType).map(x=>chip("group",x,itemType==="quality"?(t("qkind")[x]||x):x)).join("")}</div>`;
+  const showBook=!ITEM_SECS[sec]&&!["weapon","armor","gear"].includes(P.type);
   return `<div class="filters" style="margin:${sec?"0":"-16px -16px 0"}">
     <input class="t" type="search" id="pq" placeholder="${t("search")}" value="${esc(P.q)}" aria-label="${t("search")}">
     ${types.length>1?`<div class="chips"><span class="lab">${t("typ")}</span>${chip("type","all",t("all"))}${types.map(x=>chip("type",x,STR[lang].typesP[x])).join("")}</div>`:""}
     ${groupRow}
-    <div class="chips"><span class="lab">${t("book")}</span>${chip("book","all",t("all"))}${["GB","SH","MK","KORT"].map(x=>chip("book",x,STR[lang].books[x])).join("")}</div>
+    ${showBook?`<div class="chips"><span class="lab">${t("book")}</span>${chip("book","all",t("all"))}${["GB","SH","MK","KORT"].map(x=>chip("book",x,STR[lang].books[x])).join("")}</div>`:""}
     <div class="row small"><span class="muted" id="pcount"></span><label class="row muted" style="margin-left:auto;gap:6px">${t("sort")}
       <select class="t" id="psort" style="width:auto;padding:4px 8px">${[["name","sortName"],["group","sortGroup"],["book","sortBook"]].map(([v,l])=>`<option value="${v}" ${P.sort===v?"selected":""}>${t(l)}</option>`).join("")}</select></label></div>
   </div><div class="results" id="pres" style="${sec?"padding:0 16px":""}"></div>`;
@@ -582,12 +626,13 @@ function pickerHtml(sec){
 function groupKey(e){
   if(e.type==="power"||e.type==="ritual"||e.type==="tradition") return e.specialization?tr(e.traditions[0])+" – "+sp(e.specialization):(e.traditions.map(tr).join(", ")||"—");
   if(e.type==="ability") return e.archetypes.length?e.archetypes.map(ar).join(", "):"—";
+  if(e.item) return (e.type==="gear"?e.item.cat:e.type==="quality"?(t("qkind")[e.item.kind]||e.item.kind):e.item.sub)||STR[lang].typesP[e.type];
   return STR[lang].typesP[e.type];
 }
 function filterData(sec){
   const types=pickerTypes(sec); const q=P.q.trim().toLowerCase();
   let r=DATA.filter(e=>types.includes(e.type)&&(P.type==="all"||e.type===P.type)&&(P.book==="all"||e.book===P.book));
-  if(P.group!=="all") r=r.filter(e=>e.traditions.includes(P.group)||e.archetypes.includes(P.group));
+  if(P.group!=="all") r=r.filter(e=>e.traditions.includes(P.group)||e.archetypes.includes(P.group)||(e.item&&(e.item.sub===P.group||e.item.cat===P.group||e.item.kind===P.group)));
   if(q) r=r.filter(e=>{ const a=nameOf(e).toLowerCase(); if(a.includes(q)) return true;
       const s=[e.sv,e.en].map(x=>[x.name,x.desc,x.novice,x.adept,x.master].join(" ")).join(" ").toLowerCase(); return s.includes(q); })
     .sort((a,b)=>(nameOf(b).toLowerCase().includes(q))-(nameOf(a).toLowerCase().includes(q)));
@@ -595,7 +640,7 @@ function filterData(sec){
   if(!q||P.sort!=="name"){
     if(P.sort==="name") r.sort(byName);
     else if(P.sort==="group") r.sort((a,b)=>groupKey(a).localeCompare(groupKey(b),lang)||byName(a,b));
-    else r.sort((a,b)=>a.book.localeCompare(b.book)||byName(a,b));
+    else r.sort((a,b)=>(a.book||"ZZ").localeCompare(b.book||"ZZ")||byName(a,b));
   }
   return r;
 }
@@ -604,10 +649,11 @@ function renderResults(root,sec){
   root.querySelector("#pcount").textContent=t("results",{n:r.length});
   let html="", last=null;
   for(const e of r.slice(0,400)){
-    if(P.sort!=="name"&&!P.q.trim()){ const g=P.sort==="group"?groupKey(e):STR[lang].books[e.book]; if(g!==last){ html+=`<div class="grouphead">${esc(g)}</div>`; last=g; } }
-    const has=c&&c.abilities.some(o=>o.ref===e.id);
+    if(P.sort!=="name"&&!P.q.trim()){ const g=P.sort==="group"?groupKey(e):(STR[lang].books[e.book]||STR[lang].typesP[e.type]); if(g!==last){ html+=`<div class="grouphead">${esc(g)}</div>`; last=g; } }
+    const has=c&&!isItem(e)&&c.abilities.some(o=>o.ref===e.id);
+    const sub=isItem(e)?`${esc(STR[lang].types[e.type])} · ${esc(itemLine(e))}`:`${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""} · ${esc(bookLine(e))}`;
     html+=`<button class="res" data-act="detail" data-id="${e.id}"><div><div class="nm">${esc(nameOf(e))}</div>
-      <div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""} · ${esc(bookLine(e))}</div></div>
+      <div class="sub">${sub}</div></div>
       ${has?`<span class="right pill ok">✓</span>`:""}</button>`;
   }
   root.querySelector("#pres").innerHTML=html||`<div class="empty small" style="margin-top:12px">—</div>`;
@@ -622,12 +668,14 @@ function bindPicker(root,sec){
     holder.innerHTML=html; P.q=keepQ; bindPicker(root,sec); }));
 }
 function openPicker(sec){
-  P.sec=sec; P.type="all"; P.group="all"; P.q=""; P.sort=sec==="mystic"?"group":"name";
-  const title={abilities:"addAbility",mystic:"addMystic",traits:"addTrait"}[sec];
-  const el=sheet(`<div class="sheet-head"><h2>${t(title)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
+  P.sec=sec; P.type="all"; P.group="all"; P.q=""; P.book="all"; P.sort=(sec==="mystic"||ITEM_SECS[sec])?"group":"name";
+  const title={abilities:"addAbility",mystic:"addMystic",traits:"addTrait",weapons:"pickW",armors:"pickA",gear:"pickG"}[sec];
+  const custom=ITEM_SECS[sec]?`<button class="btn sm" data-custom="${sec}">+ ${t({weapons:"customW",armors:"customA",gear:"customG"}[sec])}</button>`:"";
+  const el=sheet(`<div class="sheet-head"><h2>${t(title)}</h2>${custom}<button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
     <div class="sheet-body" style="padding:0"><div class="pickwrap">${pickerHtml(sec)}</div></div>`,{tall:true});
   bindPicker(el,sec);
-  el.addEventListener("click",ev=>{ const b=ev.target.closest('[data-act="detail"]'); if(b) openDetail(b.dataset.id); });
+  el.addEventListener("click",ev=>{ const b=ev.target.closest('[data-act="detail"]'); if(b){ ITEM_SECS[sec]?openItemDetail(b.dataset.id,sec):openDetail(b.dataset.id); return; }
+    const cb=ev.target.closest("[data-custom]"); if(cb){ closeAll(); customItem(cur(),cb.dataset.custom,-1); } });
 }
 
 /* ---------- ability detail ---------- */
@@ -677,6 +725,51 @@ function openDetail(id,ownedIdx){
   });
 }
 
+/* ---------- item detail ---------- */
+function itemDetailHtml(e){
+  const it=e.item||{}; const rows=[];
+  const row=(k,v)=>v?rows.push(`<div class="kv"><span>${k}</span><span>${v}</span></div>`):0;
+  if(e.type==="quality"){ row(t("kind"),esc(t("qkind")[it.kind]||it.kind)); row(t("applies"),esc(it.applies||"")); if(e.ref) row(t("book"),esc(bookLine(e))); }
+  else { row(t("category"),esc([it.cat,it.sub].filter(Boolean).join(" · ")));
+    row(e.type==="armor"?t("prot"):t("dmg"),esc(it.dmg||""));
+    if(it.quals) row(t("quality"),qualChips(it.quals));
+    if(e.type==="armor") row(t("impede"),String(calcImpede(it.quals)));
+    row(t("cost"),esc(it.cost||""));
+    if(it.ability) row(t("requires"),esc(it.ability+(it.level?" ("+it.level.toLowerCase()+")":"")));
+    if(it.blackMarket) row("",`<span class="pill warn">${t("blackMarket")}</span>`); }
+  let extra="";
+  if(e.type==="quality"){ const items=DATA.filter(x=>x.item&&x.item.quals&&qualTokens(x.item.quals).some(tok=>{const q=findQual(tok); return q&&q.id===e.id;}));
+    if(items.length) extra=`<h4 class="sub-h" style="margin-top:14px">${t("withQual")}</h4><div class="qrow">${items.map(x=>`<button class="qchip" data-qitem="${x.id}">${esc(x.sv.name)}</button>`).join(" ")}</div>`; }
+  return `<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"><span class="pill">${esc(STR[lang].types[e.type])}</span>${lang==="en"?`<span class="pill">${t("svOnly")}</span>`:""}</div>
+    ${rows.length?`<div class="kvs">${rows.join("")}</div>`:""}<div class="detail" style="margin-top:12px">${paras(e.sv.desc||"")}</div>${extra}`;
+}
+function openItemDetail(id,sec){
+  const e=BYID[id]; if(!e) return; const c=cur();
+  const adding=!!(sec&&c);
+  const foot=adding?`<label class="row small muted" style="gap:6px;margin-right:auto"><input type="checkbox" id="payChk"> ${t("payChk")}${e.item&&e.item.cost?` (${esc(e.item.cost)})`:""}</label>
+      <button class="btn primary" id="addItem">+ ${t("add")}</button>`:"";
+  const el=sheet(`<div class="sheet-head"><h2>${esc(e.sv.name)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
+    <div class="sheet-body">${itemDetailHtml(e)}</div>${foot?`<div class="sheet-foot">${foot}</div>`:""}`,{tall:true,stack:true});
+  el.addEventListener("click",ev=>{
+    const q=ev.target.closest("[data-qual],[data-qitem]"); if(q){ openItemDetail(q.dataset.qual||q.dataset.qitem); return; }
+    if(ev.target.id!=="addItem") return;
+    const it=e.item||{}; let o;
+    if(sec==="armors") o={name:e.sv.name,prot:it.dmg||"",impede:String(calcImpede(it.quals)),quality:it.quals||"",worn:true,ref:e.id};
+    else if(sec==="weapons") o={name:e.sv.name,dmg:it.dmg||"",quality:it.quals&&it.quals!=="-"?it.quals:"",attr:"accurate",main:!c.weapons.length,inUse:true,ref:e.id};
+    else o={name:e.sv.name,cost:it.cost||"",note:"",ref:e.id};
+    let msg=t("added",{x:e.sv.name});
+    if(el.querySelector("#payChk").checked){ const r=payFor(c,it.cost); msg=r.ok?(r.amount?t("paid",{x:e.sv.name,y:fmtCoins(r.amount)}):msg):t("noMoney",{x:e.sv.name}); }
+    c[sec==="armors"?"armors":sec==="weapons"?"weapons":"gear"].push(o); touch(c); closeAll(); render(); toast(msg);
+  });
+}
+function customItem(c,sec,i){
+  if(sec==="weapons") listEdit(c,"weapons",i,t(i<0?"customW":"weapons"),
+      [["name",t("name"),"text"],["dmg",t("dmg"),"text","1T8"],["quality",t("quality"),"quals","Vapen"],["attr",t("attr"),"select",ATTRS.map(k=>[k,t(k)])],["main",t("mainW"),"check"],["inUse",t("inUse"),"check"]],{name:"",dmg:"",quality:"",attr:"accurate",main:false,inUse:true});
+  else if(sec==="armors") listEdit(c,"armors",i,t(i<0?"customA":"armors"),
+      [["name",t("name"),"text"],["prot",t("prot"),"text","1T4"],["impede",t("impede"),"num",t("impedeHint")],["quality",t("quality"),"quals","Rustning"],["worn",t("worn"),"check"]],{name:"",prot:"",impede:"",quality:"",worn:true});
+  else listEdit(c,"gear",i,t(i<0?"customG":"gear"),[["name",t("name"),"text"],["cost",t("cost"),"text"],["note",t("note"),"text"]],{name:"",cost:"",note:""});
+}
+
 /* ---------- sheets (modals) ---------- */
 function sheet(inner,opt={}){
   const layer=$("#layer"); if(!opt.stack) layer.innerHTML="";
@@ -698,6 +791,9 @@ function formSheet(title,fields,vals,onSave,onDelete){
     const v=vals[k]??"";
     if(type==="check") return `<label class="row small"><input type="checkbox" id="f_${k}" ${v?"checked":""}> ${esc(l)}</label>`;
     if(type==="select") return `<label class="f" for="f_${k}">${esc(l)}<select class="t" id="f_${k}">${opts.map(([ov,ol])=>`<option value="${esc(ov)}" ${v===ov?"selected":""}>${esc(ol)}</option>`).join("")}</select></label>`;
+    if(type==="quals"){ const toks=qualTokens(v); const sel=new Set(toks.map(x=>{const q=findQual(x); return q?q.sv.name:null;}).filter(Boolean));
+      const other=toks.filter(x=>!findQual(x)); const qs=DATA.filter(e=>e.type==="quality"&&(!e.item.applies||e.item.applies.includes(opts)||(opts==="Vapen"&&e.item.applies.includes("Sköld")))).sort((a,b)=>a.sv.name.localeCompare(b.sv.name,"sv"));
+      return `<div class="f"><span>${esc(l)}</span><div class="chips wrap" id="f_${k}" data-other="${esc(other.join(", "))}">${qs.map(q=>`<button type="button" data-qn="${esc(q.sv.name)}" aria-pressed="${sel.has(q.sv.name)}">${esc(q.sv.name)}</button>`).join("")}</div>${other.length?`<span class="small muted">+ ${esc(other.join(", "))}</span>`:""}</div>`; }
     if(type==="area") return `<label class="f" for="f_${k}">${esc(l)}<textarea class="t" id="f_${k}">${esc(v)}</textarea></label>`;
     if(type==="color") return `<div class="f"><span>${esc(l)}</span><div class="swatches" id="f_${k}" data-v="${esc(v)}">${COLORS.map(cl=>`<button type="button" style="background:${cl}" data-c="${cl}" aria-label="${cl}" aria-pressed="${v===cl}"></button>`).join("")}</div></div>`;
     return `<label class="f" for="f_${k}">${esc(l)}<input class="t" id="f_${k}" value="${esc(v)}" ${type==="num"?'inputmode="numeric"':""} placeholder="${esc(opts||"")}"></label>`;
@@ -705,9 +801,10 @@ function formSheet(title,fields,vals,onSave,onDelete){
   const el=sheet(`<div class="sheet-head"><h2>${esc(title)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
     <form class="sheet-body stack" id="fs">${f}</form>
     <div class="sheet-foot">${onDelete?`<button class="btn danger" id="fdel" style="margin-right:auto">${t("del")}</button>`:""}<button class="btn" data-close>${t("cancel")}</button><button class="btn primary" id="fsave">${t("save")}</button></div>`,{focus:true});
+  el.querySelectorAll("[data-qn]").forEach(b=>b.onclick=()=>b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true"));
   el.querySelectorAll(".swatches button").forEach(b=>b.onclick=()=>{ const w=b.parentElement; w.dataset.v=b.dataset.c; w.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); });
   const collect=()=>{ const o={}; fields.forEach(([k,,type])=>{ const n=el.querySelector("#f_"+k);
-      o[k]=type==="check"?n.checked:type==="color"?n.dataset.v:n.value; }); return o; };
+      o[k]=type==="check"?n.checked:type==="color"?n.dataset.v:type==="quals"?[...[...n.querySelectorAll('[data-qn][aria-pressed="true"]')].map(b=>b.dataset.qn),...qualTokens(n.dataset.other)].join(", "):n.value; }); return o; };
   const doSave=()=>{ onSave(collect()); closeTop(); };
   el.querySelector("#fsave").onclick=doSave;
   el.querySelector("#fs").addEventListener("submit",ev=>{ev.preventDefault(); doSave();});
@@ -733,6 +830,7 @@ $("#backBtn").onclick=()=>{ S.view="chars"; render(); };
 const setLang=l=>{ lang=l; try{localStorage.setItem("sym.lang",l);}catch(e){} closeAll(); if(S.user) render(); else showLogin(); };
 $("#langSv").onclick=()=>setLang("sv"); $("#langEn").onclick=()=>setLang("en");
 $("#main").addEventListener("click",ev=>{
+  const qb=ev.target.closest("[data-qual]"); if(qb){ openItemDetail(qb.dataset.qual); return; }
   const b=ev.target.closest("[data-act]"); if(!b) return; const act=b.dataset.act; const c=cur();
   if(act==="open"){ S.charId=b.dataset.id; S.view="char"; S.sub="overview"; S.editStats=false; render(); $("#main").scrollTop=0; }
   else if(act==="newChar") editCharSheet(null);
@@ -742,12 +840,11 @@ $("#main").addEventListener("click",ev=>{
   else if(act==="step"){ const f=b.dataset.f; const inp=b.parentElement.querySelector("input"); setField(c,f,(parseInt(inp.value)||0)+(+b.dataset.d)); inp.value=getField(c,f); updateDerived(c); }
   else if(act==="pick") openPicker(b.dataset.sec);
   else if(act==="ownedDetail"){ const o=c.abilities[+b.dataset.i]; openDetail(o.ref,+b.dataset.i); }
-  else if(act==="detail") openDetail(b.dataset.id);
-  else if(act==="editW") listEdit(c,"weapons",+b.dataset.i,t(+b.dataset.i<0?"newWeapon":"weapons"),
-      [["name",t("name"),"text"],["dmg",t("dmg"),"text","1T8"],["quality",t("quality"),"text"],["attr",t("attr"),"select",ATTRS.map(k=>[k,t(k)])],["main",t("mainW"),"check"]],{name:"",dmg:"",quality:"",attr:"accurate",main:false});
-  else if(act==="editA") listEdit(c,"armors",+b.dataset.i,t(+b.dataset.i<0?"newArmor":"armors"),
-      [["name",t("name"),"text"],["prot",t("prot"),"text","1T4"],["impede",t("impede"),"num",t("impedeHint")],["quality",t("quality"),"text"],["worn",t("worn"),"check"]],{name:"",prot:"",impede:"",quality:"",worn:true});
-  else if(act==="editG") listEdit(c,"gear",+b.dataset.i,t(+b.dataset.i<0?"newItem":"gear"),[["name",t("name"),"text"],["cost",t("cost"),"text"],["note",t("note"),"text"]],{name:"",cost:"",note:""});
+  else if(act==="detail"){ const e=BYID[b.dataset.id]; e&&isItem(e)?openItemDetail(e.id):openDetail(b.dataset.id); }
+  else if(act==="editW") customItem(c,"weapons",+b.dataset.i);
+  else if(act==="editA") customItem(c,"armors",+b.dataset.i);
+  else if(act==="editG") customItem(c,"gear",+b.dataset.i);
+  else if(act==="itemInfo") openItemDetail(b.dataset.ref);
   else if(act==="editN"){ const i=+b.dataset.i; listEdit(c,"notes",i,t(i<0?"newNote":"note"),[["text",t("note"),"area"]],{text:"",date:Date.now()}); }
   else if(act==="lang") setLang(b.dataset.l);
   else if(act==="export") doExport();
