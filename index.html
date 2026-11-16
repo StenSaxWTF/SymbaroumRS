@@ -85,6 +85,15 @@ nav.tabs button[aria-current="page"] svg{color:var(--accent)}
 @media (min-width:560px){.attrs{grid-template-columns:repeat(4,1fr)}}
 .attr{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
 .attr .name{font-size:.88rem;color:var(--muted)}
+.attrgrid,.dergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.dergrid{grid-template-columns:repeat(5,1fr)}
+@media (max-width:560px){.dergrid{grid-template-columns:repeat(3,1fr)}.dergrid>.dv:last-child{grid-column:span 2}}
+.av,.dv{background:var(--panel-2);padding:7px 6px 6px;display:flex;flex-direction:column;align-items:center;gap:1px;text-align:center;position:relative;min-width:0}
+.av .name,.dv .name{font-size:clamp(.62rem,2.6vw,.76rem);color:var(--muted);line-height:1.35;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.dv .name{white-space:normal}
+.av .num,.dv .num{font-family:var(--display);font-size:1.45rem;line-height:1.1}
+.modtag{position:absolute;top:3px;right:5px;font-size:.68rem;color:var(--accent)}
+.sub-h{font-family:var(--display);font-size:1rem;color:var(--muted);margin-top:2px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
 .tile{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:10px}
 .tile .k{font-size:.82rem;color:var(--muted)}
@@ -197,7 +206,7 @@ details.drawer[open]>summary .hint{visibility:hidden}
 "use strict";
 /* ---------- i18n ---------- */
 const STR={
-sv:{account:"Konto",signedInAs:"Inloggad som",signOut:"Logga ut",changePw:"Byt lösenord",newPw:"Nytt lösenord (minst 8 tecken)",pwShort:"Lösenordet måste vara minst 8 tecken",pwChanged:"Lösenordet är bytt",
+sv:{done:"Klar",editStats:"Ändra värden",strongGift:"Stark gåva",ranks:"Antal gånger",account:"Konto",signedInAs:"Inloggad som",signOut:"Logga ut",changePw:"Byt lösenord",newPw:"Nytt lösenord (minst 8 tecken)",pwShort:"Lösenordet måste vara minst 8 tecken",pwChanged:"Lösenordet är bytt",
 loginTitle:"Logga in",loginHint:"Använd e-post och lösenord som du fått av den som driver appen.",email:"E-post",password:"Lösenord",signIn:"Logga in",badLogin:"Fel e-post eller lösenord.",noNet:"Ingen internetanslutning.",
 rulesErr:"Regeldata kunde inte laddas. Kontrollera anslutningen och ladda om sidan.",offline:"Kunde inte nå servern. Ändringar sparas på enheten och synkas när du är online igen.",
 install:"Installera som app",installHint:"iPhone/iPad: öppna sidan i Safari, tryck på Dela och välj Lägg till på hemskärmen. Dator: klicka på installera-ikonen i adressfältet i Chrome eller Edge. Logga in en gång i den installerade appen.",
@@ -232,7 +241,7 @@ books:{GB:"Grundbok",SH:"Spelarens handbok",MK:"Monsterkodex",KORT:"Förmågekor
 saveErr:"Kunde inte spara till kontot. Ändringen finns kvar i den här webbläsaren.",
 xpCostHint:"Kostnad",
 },
-en:{account:"Account",signedInAs:"Signed in as",signOut:"Sign out",changePw:"Change password",newPw:"New password (at least 8 characters)",pwShort:"The password must be at least 8 characters",pwChanged:"Password changed",
+en:{done:"Done",editStats:"Edit values",strongGift:"Strong Gift",ranks:"Times taken",account:"Account",signedInAs:"Signed in as",signOut:"Sign out",changePw:"Change password",newPw:"New password (at least 8 characters)",pwShort:"The password must be at least 8 characters",pwChanged:"Password changed",
 loginTitle:"Sign in",loginHint:"Use the email and password you got from whoever runs the app.",email:"Email",password:"Password",signIn:"Sign in",badLogin:"Wrong email or password.",noNet:"No internet connection.",
 rulesErr:"The rules data could not be loaded. Check your connection and reload the page.",offline:"Could not reach the server. Changes are kept on this device and sync when you're back online.",
 install:"Install as an app",installHint:"iPhone/iPad: open the page in Safari, tap Share and choose Add to Home Screen. Computer: click the install icon in the address bar in Chrome or Edge. Sign in once in the installed app.",
@@ -291,8 +300,13 @@ let DATA=[], BYID={};
 const L=(e,l=lang)=>e[l]||e.sv;
 const nameOf=e=>L(e).name;
 const hasLevels=e=>e.type!=="ritual" && !!(e.sv.novice||e.en.novice);
+/* boons whose text says they can be acquired several times (max three) */
+const maxRanks=e=>{ if(e._mr!==undefined) return e._mr;
+  const txt=[e.sv.desc,e.sv.novice,e.en.desc,e.en.novice].join(" ");
+  return e._mr=(e.type==="boon"&&/kan införskaffas flera gånger|can be acquired multiple times/i.test(txt))?3:1; };
 function costOf(e,o){ if(o.free) return 0;
   if(hasLevels(e)) return [0,10,30,60][o.level||1];
+  if(e.type==="boon") return 5*Math.min(maxRanks(e),o.ranks||1);
   return {ritual:10,boon:5,burden:-5,trait:0,monstrous:10}[e.type]??0; }
 function groupLine(e){
   const bits=[];
@@ -372,9 +386,11 @@ function derived(c){
   const a=c.attrs, m=c.mods; const worn=c.armors.filter(x=>x.worn);
   const imp=worn.reduce((s,x)=>s+(parseInt(x.impede)||0),0);
   const tough=Math.max(a.strong,10)+(m.toughness||0);
+  const sg=c.abilities.find(o=>{const e=BYID[o.ref]; return e&&e.type==="ability"&&(e.sv.name==="Stark gåva"||e.en.name==="Strong Gift");});
+  const strongGift=!!(sg&&(sg.level||1)>=2);
   const spent=c.abilities.reduce((s,o)=>{const e=BYID[o.ref]; return s+(e?costOf(e,o):0);},0);
   return {tough, pain:Math.ceil(a.strong/2)+(m.pain||0), def:a.quick+imp+(m.defense||0), imp,
-    corrThr:Math.ceil(a.resolute/2)+(m.corrThr||0), abom:a.resolute, spent, left:(c.xpTotal||0)-spent,
+    corrThr:(strongGift?a.resolute:Math.ceil(a.resolute/2))+(m.corrThr||0), abom:strongGift?a.resolute*2:a.resolute, strongGift, spent, left:(c.xpTotal||0)-spent,
     sum:ATTRS.reduce((s,k)=>s+(+a[k]||0),0), totalCorr:(c.permCorr||0)+(c.tempCorr||0)};
 }
 
@@ -384,8 +400,10 @@ function setTitle(txt,back){ $("#title").textContent=txt; $("#backBtn").hidden=!
 function applyStaticT(){ document.querySelectorAll("[data-t]").forEach(el=>el.textContent=t(el.dataset.t));
   $("#langSv").setAttribute("aria-pressed",lang==="sv"); $("#langEn").setAttribute("aria-pressed",lang==="en");
   document.documentElement.lang=lang; $("#backBtn").setAttribute("aria-label",t("back")); }
+let lastViewKey="";
 function render(){
   applyStaticT();
+  const vk=S.view+"|"+(S.view==="char"?S.charId+"|"+S.sub:"");
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",(b.dataset.nav===S.view||(S.view==="char"&&b.dataset.nav==="chars"))?"page":"false"));
   const m=$("#main");
   if(S.view==="chars") m.innerHTML=viewChars();
@@ -393,6 +411,7 @@ function render(){
   else if(S.view==="lib") m.innerHTML=viewLib();
   else if(S.view==="settings") m.innerHTML=viewSettings();
   if(S.view==="lib") bindPicker(m,null);
+  if(vk!==lastViewKey){ m.scrollTop=0; window.scrollTo(0,0); lastViewKey=vk; }
 }
 function viewChars(){
   setTitle(t("navChars"),false);
@@ -425,8 +444,10 @@ function subOverview(c){
   const d=derived(c); const hp=d.tough-(c.damage||0); const pct=Math.max(0,Math.min(100,hp/d.tough*100));
   const cp=Math.min(100,d.totalCorr/Math.max(1,d.abom)*100);
   const sumCls=d.sum===80?"ok":"warn";
-  const tile=(k,v,f,mod)=>`<div class="tile"><div class="k">${t(k)}</div><div class="v" data-d="${k}">${v}</div><div class="f">${f}</div>
-     <label class="f small" style="margin-top:6px">${t("modifier")}${stepper("mods."+mod,c.mods[mod]||0)}</label></div>`;
+  const ed=!!S.editStats;
+  const tile=(k,v,f,mod)=> ed?`<div class="tile"><div class="k">${t(k)}</div><div class="v" data-d="${k}">${v}</div><div class="f">${f}</div>
+     <label class="f small" style="margin-top:6px">${t("modifier")}${stepper("mods."+mod,c.mods[mod]||0)}</label></div>`
+     :`<div class="dv"><span class="name">${t(k)}</span><span class="num" data-d="${k}">${v}</span>${c.mods[mod]?`<span class="modtag">${c.mods[mod]>0?"+":""}${c.mods[mod]}</span>`:""}</div>`;
   return `
   <div class="card stack">
     <div class="track"><span class="lbl">${t("toughness")}</span><span class="val" data-d="hp">${hp} / ${d.tough}</span>
@@ -437,14 +458,18 @@ function subOverview(c){
       <span class="small muted">${t("tempCorr")}</span>${stepper("tempCorr",c.tempCorr||0)}
       <span class="small muted">${t("permCorr")}</span>${stepper("permCorr",c.permCorr||0)}</div>
   </div>
-  <div class="card stack"><div class="sec-head"><h3>${t("attributes")}</h3><span class="pill ${sumCls}" data-d="sum">${t("attrSum",{n:d.sum})}</span></div>
-    <div class="attrs">${ATTRS.map(k=>`<div class="attr"><span class="name">${t(k)}</span>${stepper("attrs."+k,c.attrs[k])}</div>`).join("")}</div></div>
-  <div class="card stack"><h3>${t("derived")}</h3><div class="tiles">
+  <div class="card stack"><div class="sec-head"><h3>${t("attributes")}</h3>${(ed||d.sum!==80)?`<span class="pill ${sumCls}" data-d="sum">${t("attrSum",{n:d.sum})}</span>`:""}
+      <button class="btn sm ${ed?"primary":""}" data-act="toggleEdit">${ed?t("done"):t("editStats")}</button></div>
+    ${ed?`<div class="attrs">${ATTRS.map(k=>`<div class="attr"><span class="name">${t(k)}</span>${stepper("attrs."+k,c.attrs[k])}</div>`).join("")}</div>`
+       :`<div class="attrgrid">${ATTRS.map(k=>`<div class="av"><span class="name">${t(k)}</span><span class="num">${c.attrs[k]}</span></div>`).join("")}</div>`}
+    <div class="sub-h">${t("derived")}</div>
+    <div class="${ed?"tiles":"dergrid"}">
     ${tile("toughness",d.tough,`max(${t("strong")}, 10)`,"toughness")}
     ${tile("pain",d.pain,`${t("strong")} ÷ 2`,"pain")}
     ${tile("defense",d.def,`${t("quick")}${d.imp?` ${d.imp}`:""}`,"defense")}
-    ${tile("corrThr",d.corrThr,`${t("resolute")} ÷ 2`,"corrThr")}
-    <div class="tile"><div class="k">${t("abomThr")}</div><div class="v" data-d="abomThr">${d.abom}</div><div class="f">= ${t("resolute")}</div></div>
+    ${tile("corrThr",d.corrThr,d.strongGift?`${t("resolute")} (${t("strongGift")})`:`${t("resolute")} ÷ 2`,"corrThr")}
+    ${ed?`<div class="tile"><div class="k">${t("abomThr")}</div><div class="v" data-d="abomThr">${d.abom}</div><div class="f">${d.strongGift?`${t("resolute")} × 2 (${t("strongGift")})`:`= ${t("resolute")}`}</div></div>`
+        :`<div class="dv"><span class="name">${t("abomThr")}</span><span class="num" data-d="abomThr">${d.abom}</span></div>`}
   </div></div>
   <div class="card stack"><h3>${t("xp")}</h3>
     <div class="tiles">
@@ -459,7 +484,7 @@ function ownedList(c,types){
   if(!rows.length) return `<div class="empty small">${t("none")}</div>`;
   return `<div class="owned">${rows.map(({o,i,e})=>`<button class="item" data-act="ownedDetail" data-i="${i}">
      <div><div class="nm">${esc(nameOf(e))}</div><div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""}</div></div>
-     <div class="right">${hasLevels(e)?`<span class="pill lv">${t(["","novice","adept","master"][o.level||1])}</span>`:""}<span class="pill num">${o.free?"0":costOf(e,o)} XP</span></div></button>`).join("")}</div>`;
+     <div class="right">${hasLevels(e)?`<span class="pill lv">${t(["","novice","adept","master"][o.level||1])}</span>`:""}${maxRanks(e)>1?`<span class="pill lv">×${o.ranks||1}</span>`:""}<span class="pill num">${o.free?"0":costOf(e,o)} XP</span></div></button>`).join("")}</div>`;
 }
 function subAbilities(c){
   const sec=(key,title,addKey)=>`<div class="stack"><div class="sec-head"><h3>${t(title)}</h3><button class="btn sm" data-act="pick" data-sec="${key}">+ ${t(addKey)}</button></div>${ownedList(c,SECTIONS[key])}</div>`;
@@ -630,11 +655,12 @@ function openDetail(id,ownedIdx){
   const inAdd=!!document.querySelector("#layer .pickwrap");
   const foot=()=>{
     if(!c) return "";
-    if(owned){ const lvBtns=hasLevels(e)?`<div class="seg" role="group" style="margin-right:auto">${[1,2,3].map(n=>`<button data-setlv="${n}" aria-pressed="${(owned.level||1)===n}">${t(["","novice","adept","master"][n])}</button>`).join("")}</div>`:"";
+    if(owned){ const lvBtns=maxRanks(e)>1?`<div class="row" style="gap:6px;margin-right:auto"><span class="small muted">${t("ranks")}</span><div class="seg" role="group">${[1,2,3].slice(0,maxRanks(e)).map(n=>`<button data-setrank="${n}" aria-pressed="${(owned.ranks||1)===n}">${n} <span class="small">(+${n})</span></button>`).join("")}</div></div>`:hasLevels(e)?`<div class="seg" role="group" style="margin-right:auto">${[1,2,3].map(n=>`<button data-setlv="${n}" aria-pressed="${(owned.level||1)===n}">${t(["","novice","adept","master"][n])}</button>`).join("")}</div>`:"";
       return `${lvBtns}<label class="row small muted" style="gap:6px"><input type="checkbox" id="freeChk" ${owned.free?"checked":""}> ${t("free")}</label>
         <button class="btn danger sm" data-remove>${t("remove")}</button>`; }
     if(!inAdd) return "";
     if(hasLevels(e)) return [1,2,3].map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="${n}">+ ${t(["","novice","adept","master"][n])} <span class="small">(${[0,10,30,60][n]})</span></button>`).join("");
+    if(maxRanks(e)>1) return [1,2,3].slice(0,maxRanks(e)).map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="0" data-rank="${n}">+ ${n}× <span class="small">(${5*n} XP)</span></button>`).join("");
     return `<button class="btn primary" data-addlv="0">+ ${t("add")} <span class="small">(${costOf(e,{})} XP)</span></button>`;
   };
   const el=sheet(`<div class="sheet-head"><h2>${esc(nameOf(e))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
@@ -642,9 +668,10 @@ function openDetail(id,ownedIdx){
   el.addEventListener("click",ev=>{
     const b=ev.target.closest("button,input"); if(!b) return;
     if(b.dataset.dl){ detailLang=b.dataset.dl; el.querySelector("#dbody").innerHTML=detailHtml(e,owned); return; }
-    if(b.dataset.addlv!==undefined){ c.abilities.push({ref:e.id,level:+b.dataset.addlv||1}); touch(c); closeTop(); toast(t("added",{x:nameOf(e)}));
+    if(b.dataset.addlv!==undefined){ const o={ref:e.id,level:+b.dataset.addlv||1}; if(b.dataset.rank) o.ranks=+b.dataset.rank; c.abilities.push(o); touch(c); closeTop(); toast(t("added",{x:nameOf(e)}));
       const pw=document.querySelector("#layer .pickwrap"); if(pw) renderResults(pw.closest(".sheet"),P.sec); render(); return; }
     if(b.dataset.setlv){ owned.level=+b.dataset.setlv; touch(c); el.querySelectorAll("[data-setlv]").forEach(x=>x.setAttribute("aria-pressed",x===b)); el.querySelector("#dbody").innerHTML=detailHtml(e,owned); render(); return; }
+    if(b.dataset.setrank){ owned.ranks=+b.dataset.setrank; touch(c); el.querySelectorAll("[data-setrank]").forEach(x=>x.setAttribute("aria-pressed",x===b)); render(); return; }
     if(b.id==="freeChk"){ owned.free=b.checked; touch(c); render(); return; }
     if(b.dataset.remove!==undefined){ c.abilities.splice(ownedI,1); touch(c); closeTop(); render(); return; }
   });
@@ -707,10 +734,11 @@ const setLang=l=>{ lang=l; try{localStorage.setItem("sym.lang",l);}catch(e){} cl
 $("#langSv").onclick=()=>setLang("sv"); $("#langEn").onclick=()=>setLang("en");
 $("#main").addEventListener("click",ev=>{
   const b=ev.target.closest("[data-act]"); if(!b) return; const act=b.dataset.act; const c=cur();
-  if(act==="open"){ S.charId=b.dataset.id; S.view="char"; S.sub="overview"; render(); $("#main").scrollTop=0; }
+  if(act==="open"){ S.charId=b.dataset.id; S.view="char"; S.sub="overview"; S.editStats=false; render(); $("#main").scrollTop=0; }
   else if(act==="newChar") editCharSheet(null);
   else if(act==="editChar") editCharSheet(c);
   else if(act==="sub"){ S.sub=b.dataset.sub; render(); }
+  else if(act==="toggleEdit"){ S.editStats=!S.editStats; render(); }
   else if(act==="step"){ const f=b.dataset.f; const inp=b.parentElement.querySelector("input"); setField(c,f,(parseInt(inp.value)||0)+(+b.dataset.d)); inp.value=getField(c,f); updateDerived(c); }
   else if(act==="pick") openPicker(b.dataset.sec);
   else if(act==="ownedDetail"){ const o=c.abilities[+b.dataset.i]; openDetail(o.ref,+b.dataset.i); }
