@@ -70,6 +70,11 @@ nav.tabs button[aria-current="page"] svg{color:var(--accent)}
 .subtabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .subtabs button{flex:none;background:none;border:1px solid var(--line);border-radius:999px;padding:6px 13px;color:var(--muted);font-size:.92rem}
 .subtabs button[aria-pressed="true"]{border-color:var(--accent);color:var(--text);background:rgba(192,97,74,.14)}
+/* library tabs */
+.libtabs{display:grid;grid-template-columns:repeat(4,1fr);margin:-16px -16px 0;border-bottom:1px solid var(--line);background:var(--bg)}
+.libtabs button{background:none;border:0;border-bottom:2px solid transparent;padding:11px 4px 9px;color:var(--muted);font-size:.92rem;font-weight:600}
+.libtabs button[aria-pressed="true"]{color:var(--text);border-bottom-color:var(--accent)}
+.libtabs .soon{display:block;font-size:.68rem;font-weight:400;letter-spacing:.02em;opacity:.8}
 /* trackers */
 .track{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
 .track .lbl{font-weight:500}
@@ -217,7 +222,7 @@ sv:{fromList:"Välj från listan",customW:"Eget vapen",customA:"Egen rustning",c
 loginTitle:"Logga in",loginHint:"Använd e-post och lösenord som du fått av den som driver appen.",email:"E-post",password:"Lösenord",signIn:"Logga in",badLogin:"Fel e-post eller lösenord.",noNet:"Ingen internetanslutning.",
 rulesErr:"Regeldata kunde inte laddas. Kontrollera anslutningen och ladda om sidan.",offline:"Kunde inte nå servern. Ändringar sparas på enheten och synkas när du är online igen.",
 install:"Installera som app",installHint:"iPhone/iPad: öppna sidan i Safari, tryck på Dela och välj Lägg till på hemskärmen. Dator: klicka på installera-ikonen i adressfältet i Chrome eller Edge. Logga in en gång i den installerade appen.",
-navChars:"Rollpersoner",navLib:"Bibliotek",navSettings:"Inställningar",back:"Tillbaka",loading:"Laddar…",
+navChars:"Rollpersoner",navLib:"Bibliotek",libAbil:"Förmågor",libItems:"Utrustning",libJobs:"Yrken",libRaces:"Släkten",soon:"kommer snart",libJobsEmpty:"Här kommer arketyper, yrken och elityrken att listas.",libRacesEmpty:"Här kommer släktena att listas.",navSettings:"Inställningar",back:"Tillbaka",loading:"Laddar…",
 newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",color:"Färg",
 save:"Spara",cancel:"Avbryt",del:"Radera",edit:"Redigera",add:"Lägg till",close:"Stäng",confirmDel:"Radera {x}? Det går inte att ångra.",
 tOverview:"Översikt",tAbilities:"Förmågor",tCombat:"Strid",tGear:"Utrustning",tNotes:"Anteckningar",
@@ -252,7 +257,7 @@ en:{fromList:"Choose from the list",customW:"Custom weapon",customA:"Custom armo
 loginTitle:"Sign in",loginHint:"Use the email and password you got from whoever runs the app.",email:"Email",password:"Password",signIn:"Sign in",badLogin:"Wrong email or password.",noNet:"No internet connection.",
 rulesErr:"The rules data could not be loaded. Check your connection and reload the page.",offline:"Could not reach the server. Changes are kept on this device and sync when you're back online.",
 install:"Install as an app",installHint:"iPhone/iPad: open the page in Safari, tap Share and choose Add to Home Screen. Computer: click the install icon in the address bar in Chrome or Edge. Sign in once in the installed app.",
-navChars:"Characters",navLib:"Library",navSettings:"Settings",back:"Back",loading:"Loading…",
+navChars:"Characters",navLib:"Library",libAbil:"Abilities",libItems:"Equipment",libJobs:"Occupations",libRaces:"Races",soon:"coming soon",libJobsEmpty:"Archetypes, occupations and elite occupations will be listed here.",libRacesEmpty:"Races will be listed here.",navSettings:"Settings",back:"Back",loading:"Loading…",
 newChar:"New character",noChars:"No characters yet. Create your first one.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",color:"Colour",
 save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",add:"Add",close:"Close",confirmDel:"Delete {x}? This cannot be undone.",
 tOverview:"Overview",tAbilities:"Abilities",tCombat:"Combat",tGear:"Gear",tNotes:"Notes",
@@ -447,7 +452,7 @@ function render(){
   else if(S.view==="char") m.innerHTML=viewChar();
   else if(S.view==="lib") m.innerHTML=viewLib();
   else if(S.view==="settings") m.innerHTML=viewSettings();
-  if(S.view==="lib") bindPicker(m,null);
+  if(S.view==="lib"&&(P.tab==="abil"||P.tab==="items")) bindPicker(m,null);
   if(vk!==lastViewKey){ m.scrollTop=0; window.scrollTo(0,0); lastViewKey=vk; }
 }
 function viewChars(){
@@ -561,7 +566,10 @@ function subNotes(c){
   return `<div class="stack"><div class="sec-head"><h3>${t("notes")}</h3><button class="btn sm" data-act="editN" data-i="-1">+ ${t("newNote")}</button></div>
     ${n?`<div class="list-plain">${n}</div>`:`<div class="empty small">${t("none")}</div>`}</div>`;
 }
-function viewLib(){ setTitle(t("navLib"),false); return pickerHtml(null); }
+function viewLib(){ setTitle(t("navLib"),false);
+  const tabs=`<div class="libtabs" role="tablist">${LIB_TABS.map(([k,l])=>`<button role="tab" data-libtab="${k}" aria-pressed="${P.tab===k}">${t(l)}</button>`).join("")}</div>`;
+  if(P.tab==="jobs"||P.tab==="races") return tabs+`<div class="empty" style="margin-top:16px">${t(P.tab==="jobs"?"libJobsEmpty":"libRacesEmpty")}</div>`;
+  return tabs+`<div class="pickwrap">${pickerHtml(null)}</div>`; }
 const INSTALL={
 sv:{intro:"Lägg appen på hemskärmen eller i datorn så öppnas den i ett eget fönster, som en vanlig app. Logga in en gång i den installerade appen – den har en egen inloggning, skild från webbläsaren.",
  show:"Visa instruktioner",
@@ -600,21 +608,24 @@ function viewSettings(){
   <div class="card stack"><h3>${t("dataTitle")}</h3><p class="small muted" style="margin:0">${t("dataBody")}</p></div></div>`;
 }
 /* ---------- picker (used for adding and for the library) ---------- */
-const P={q:"",type:"all",group:"all",book:"all",sort:"name",sec:null};
-function pickerTypes(sec){ return sec?SECTIONS[sec]:["ability","tradition","power","ritual","trait","monstrous","boon","burden","weapon","armor","quality","gear"]; }
+const P={q:"",type:"all",group:"all",book:"all",sort:"name",sec:null,tab:"abil"};
+const LIB_TABS=[["abil","libAbil"],["items","libItems"],["jobs","libJobs"],["races","libRaces"]];
+const ABIL_TYPES=["ability","tradition","power","ritual","trait","monstrous","boon","burden"];
+function pickerTypes(sec){ return sec?SECTIONS[sec]:(P.tab==="items"?ITEM_TYPES:ABIL_TYPES); }
 function itemGroups(type){ const key=type==="gear"?"cat":type==="quality"?"kind":"sub"; const seen=[]; DATA.forEach(e=>{ if(e.type===type&&e.item&&e.item[key]&&!seen.includes(e.item[key])) seen.push(e.item[key]); }); return seen; }
 function pickerHtml(sec){
   const types=pickerTypes(sec);
   const chip=(k,v,l)=>`<button data-pf="${k}" data-v="${esc(v)}" aria-pressed="${P[k]===v}">${esc(l)}</button>`;
-  const showTrad=sec==="mystic"||(!sec&&["all","power","ritual","tradition"].includes(P.type));
+  const libItems=!sec&&P.tab==="items";
+  const showTrad=sec==="mystic"||(!sec&&!libItems&&["all","power","ritual","tradition"].includes(P.type));
   const showArch=sec==="abilities"||(!sec&&P.type==="ability");
   let groupRow="";
   if(showTrad) groupRow=`<div class="chips"><span class="lab">${t("tradition")}</span>${chip("group","all",t("all"))}${TRADS.map(x=>chip("group",x,tr(x))).join("")}</div>`;
   else if(showArch) groupRow=`<div class="chips"><span class="lab">${t("arche")}</span>${chip("group","all",t("all"))}${ARCHES.map(x=>chip("group",x,ar(x))).join("")}</div>`;
   const itemType=ITEM_SECS[sec]?SECTIONS[sec][0]:(!sec&&ITEM_TYPES.includes(P.type)?P.type:null);
   if(itemType) groupRow=`<div class="chips"><span class="lab">${t(itemType==="quality"?"kind":"category")}</span>${chip("group","all",t("all"))}${itemGroups(itemType).map(x=>chip("group",x,itemType==="quality"?(t("qkind")[x]||x):x)).join("")}</div>`;
-  const showBook=!ITEM_SECS[sec]&&!["weapon","armor","gear"].includes(P.type);
-  return `<div class="filters" style="margin:${sec?"0":"-16px -16px 0"}">
+  const showBook=!ITEM_SECS[sec]&&!libItems;
+  return `<div class="filters" style="margin:${sec?"0":"0 -16px"}">
     <input class="t" type="search" id="pq" placeholder="${t("search")}" value="${esc(P.q)}" aria-label="${t("search")}">
     ${types.length>1?`<div class="chips"><span class="lab">${t("typ")}</span>${chip("type","all",t("all"))}${types.map(x=>chip("type",x,STR[lang].typesP[x])).join("")}</div>`:""}
     ${groupRow}
@@ -664,7 +675,7 @@ function bindPicker(root,sec){
   root.querySelector("#psort").addEventListener("change",ev=>{P.sort=ev.target.value; renderResults(root,sec);});
   root.querySelectorAll("[data-pf]").forEach(b=>b.addEventListener("click",()=>{
     P[b.dataset.pf]=b.dataset.v; if(b.dataset.pf==="type") P.group="all";
-    const html=pickerHtml(sec); const holder=sec?root.querySelector(".pickwrap"):root; const keepQ=P.q;
+    const html=pickerHtml(sec); const holder=root.querySelector(".pickwrap")||root; const keepQ=P.q;
     holder.innerHTML=html; P.q=keepQ; bindPicker(root,sec); }));
 }
 function openPicker(sec){
@@ -825,12 +836,13 @@ function listEdit(c,key,i,title,fields,blank){
 }
 
 /* ---------- events ---------- */
-document.getElementById("tabs").addEventListener("click",ev=>{ const b=ev.target.closest("[data-nav]"); if(!b) return; S.view=b.dataset.nav; if(S.view==="lib") Object.assign(P,{q:"",type:"all",group:"all",book:"all",sort:"name",sec:null}); closeAll(); render(); $("#main").scrollTop=0; });
+document.getElementById("tabs").addEventListener("click",ev=>{ const b=ev.target.closest("[data-nav]"); if(!b) return; S.view=b.dataset.nav; if(S.view==="lib") Object.assign(P,{q:"",type:"all",group:"all",book:"all",sort:P.tab==="items"?"group":"name",sec:null}); closeAll(); render(); $("#main").scrollTop=0; });
 $("#backBtn").onclick=()=>{ S.view="chars"; render(); };
 const setLang=l=>{ lang=l; try{localStorage.setItem("sym.lang",l);}catch(e){} closeAll(); if(S.user) render(); else showLogin(); };
 $("#langSv").onclick=()=>setLang("sv"); $("#langEn").onclick=()=>setLang("en");
 $("#main").addEventListener("click",ev=>{
   const qb=ev.target.closest("[data-qual]"); if(qb){ openItemDetail(qb.dataset.qual); return; }
+  const lt=ev.target.closest("[data-libtab]"); if(lt){ if(P.tab!==lt.dataset.libtab){ Object.assign(P,{tab:lt.dataset.libtab,q:"",type:"all",group:"all",book:"all",sort:lt.dataset.libtab==="items"?"group":"name"}); render(); $("#main").scrollTop=0; } return; }
   const b=ev.target.closest("[data-act]"); if(!b) return; const act=b.dataset.act; const c=cur();
   if(act==="open"){ S.charId=b.dataset.id; S.view="char"; S.sub="overview"; S.editStats=false; render(); $("#main").scrollTop=0; }
   else if(act==="newChar") editCharSheet(null);
