@@ -183,6 +183,9 @@ button.pill{background:rgba(192,97,74,.12);border:1px solid #6a3a32;color:var(--
 .occ dd{margin:0;line-height:1.9}
 .occ dd .ln{display:block}
 .occ .note{font-size:.85rem;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:12px 0 0}
+.charmeta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin-top:2px}
+.pickchips{margin-top:6px}
+.pickchips button{font-size:.8rem;padding:3px 10px}
 .qchip.ref{font-size:.88rem;padding:1px 9px;margin:1px 0}
 /* ability detail */
 .detail p{margin:0 0 .6em;max-width:68ch}
@@ -239,7 +242,7 @@ loginTitle:"Logga in",loginHint:"Använd e-post och lösenord som du fått av de
 rulesErr:"Regeldata kunde inte laddas. Kontrollera anslutningen och ladda om sidan.",offline:"Kunde inte nå servern. Ändringar sparas på enheten och synkas när du är online igen.",
 install:"Installera som app",installHint:"iPhone/iPad: öppna sidan i Safari, tryck på Dela och välj Lägg till på hemskärmen. Dator: klicka på installera-ikonen i adressfältet i Chrome eller Edge. Logga in en gång i den installerade appen.",
 navChars:"Rollpersoner",navLib:"Bibliotek",libAbil:"Förmågor",libItems:"Utrustning",libJobs:"Yrken",libRaces:"Släkten",soon:"kommer snart",libJobsEmpty:"Här kommer arketyper, yrken och elityrken att listas.",jobsCommon:"Yrken",jobsElite:"Elityrken",elite:"Elityrke",eliteFor:"Elityrke för {x}",aboutArch:"Om arketypen",occRace:"Förslag på släkte",occAbil:"Lämpliga förmågor",occReq:"Krav på förmågor",occOther:"Andra krav",occUnique:"Unika förmågor",occBoons:"Möjliga fördelar",occBurdens:"Tänkbara nackdelar",archAbility:"Arketypisk förmåga",archNote:"Kräver minst tre förmågor från arketypens lista (novisnivå räcker).",archAbils:"Arketypens förmågor",archOccs:"Yrken",eliteNote:"Rollpersonen måste ha samtliga kravförmågor, varav minst en på mästarnivå. Går inte att välja vid start.",archetype:"Arketyp",libRacesEmpty:"Här kommer släktena att listas.",navSettings:"Inställningar",back:"Tillbaka",loading:"Laddar…",
-newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",color:"Färg",
+newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",pickOrType:"Välj nedan eller skriv eget",color:"Färg",
 save:"Spara",cancel:"Avbryt",del:"Radera",edit:"Redigera",add:"Lägg till",close:"Stäng",confirmDel:"Radera {x}? Det går inte att ångra.",
 tOverview:"Översikt",tAbilities:"Förmågor",tCombat:"Strid",tGear:"Utrustning",tNotes:"Anteckningar",
 attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",
@@ -274,7 +277,7 @@ loginTitle:"Sign in",loginHint:"Use the email and password you got from whoever 
 rulesErr:"The rules data could not be loaded. Check your connection and reload the page.",offline:"Could not reach the server. Changes are kept on this device and sync when you're back online.",
 install:"Install as an app",installHint:"iPhone/iPad: open the page in Safari, tap Share and choose Add to Home Screen. Computer: click the install icon in the address bar in Chrome or Edge. Sign in once in the installed app.",
 navChars:"Characters",navLib:"Library",libAbil:"Abilities",libItems:"Equipment",libJobs:"Occupations",libRaces:"Races",soon:"coming soon",libJobsEmpty:"Archetypes, occupations and elite occupations will be listed here.",jobsCommon:"Occupations",jobsElite:"Elite occupations",elite:"Elite occupation",eliteFor:"Elite occupation for {x}",aboutArch:"About the archetype",occRace:"Suggested race",occAbil:"Suitable abilities",occReq:"Required abilities",occOther:"Other requirements",occUnique:"Unique abilities",occBoons:"Possible boons",occBurdens:"Possible burdens",archAbility:"Archetypal ability",archNote:"Requires at least three abilities from the archetype list (novice is enough).",archAbils:"Archetype abilities",archOccs:"Occupations",eliteNote:"The character must have all required abilities, at least one at master level. Cannot be chosen at character creation.",archetype:"Archetype",libRacesEmpty:"Races will be listed here.",navSettings:"Settings",back:"Back",loading:"Loading…",
-newChar:"New character",noChars:"No characters yet. Create your first one.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",color:"Colour",
+newChar:"New character",noChars:"No characters yet. Create your first one.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",pickOrType:"Pick below or type your own",color:"Colour",
 save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",add:"Add",close:"Close",confirmDel:"Delete {x}? This cannot be undone.",
 tOverview:"Overview",tAbilities:"Abilities",tCombat:"Combat",tGear:"Gear",tNotes:"Notes",
 attributes:"Attributes",attrSum:"Total {n} of 80",
@@ -498,7 +501,7 @@ function viewChar(){
   setTitle(c.name||"—",true);
   const subs=[["overview","tOverview"],["abilities","tAbilities"],["combat","tCombat"],["gear","tGear"],["notes","tNotes"]];
   const head=`<div class="row"><div class="hero" style="--c:${esc(c.color)};flex:1"><h2>${esc(c.name||"—")}</h2>
-    <div class="muted">${esc([c.race,c.archetype,c.occupation].filter(Boolean).join(" · "))}</div></div>
+    <div class="muted charmeta">${charMeta(c)}</div></div>
     <button class="btn sm" data-act="editChar">${t("edit")}</button></div>
     <div class="subtabs" role="group">${subs.map(([k,l])=>`<button data-act="sub" data-sub="${k}" aria-pressed="${S.sub===k}">${t(l)}</button>`).join("")}</div>`;
   let body="";
@@ -890,13 +893,34 @@ function formSheet(title,fields,vals,onSave,onDelete){
   el.querySelector("#fsave").onclick=doSave;
   el.querySelector("#fs").addEventListener("submit",ev=>{ev.preventDefault(); doSave();});
   if(onDelete) el.querySelector("#fdel").onclick=()=>onDelete();
+  return el;
 }
 function editCharSheet(c){
   const isNew=!c; const v=c||blankChar();
-  formSheet(isNew?t("newChar"):t("edit"),[["name",t("name"),"text"],["race",t("race"),"text"],["archetype",t("archetype"),"text"],["occupation",t("occupation"),"text"],["color",t("color"),"color"]],v,
+  const el=formSheet(isNew?t("newChar"):t("edit"),[["name",t("name"),"text"],["race",t("race"),"text"],["archetype",t("archetype"),"text",t("pickOrType")],["occupation",t("occupation"),"text",t("pickOrType")],["color",t("color"),"color"]],v,
    o=>{ Object.assign(v,o); if(isNew){ S.chars.push(v); S.charId=v.id; S.view="char"; S.sub="overview"; } touch(v); render(); },
    isNew?null:()=>confirmSheet(t("confirmDel",{x:v.name||"—"}),()=>{ S.chars=S.chars.filter(x=>x!==v); saveLocal(); dirty.add(v.id); saveDirty(); flush(v.id); closeAll(); S.view="chars"; render(); }));
+  // suggestion chips for archetype and occupation (free text still allowed)
+  const ai=el.querySelector("#f_archetype"), oi=el.querySelector("#f_occupation"); if(!ai||!archList().length) return;
+  const mk=(inp,id)=>{ const d=document.createElement("div"); d.className="chips wrap pickchips"; d.id=id; inp.closest(".f").appendChild(d); return d; };
+  const ac=mk(ai,"pc_arch"), oc=mk(oi,"pc_occ");
+  const draw=()=>{ const a=matchArch(ai.value);
+    ac.innerHTML=archList().map(x=>`<button type="button" data-v="${esc(L(x).name)}" aria-pressed="${a===x}">${esc(L(x).name)}</button>`).join("");
+    const occs=DATA.filter(e=>e.type==="occupation"&&!e.elite&&(!a||e.arch===a.arch)).sort((x,y)=>L(x).name.localeCompare(L(y).name,"sv")); const o=matchOcc(oi.value);
+    oc.innerHTML=occs.map(x=>`<button type="button" data-v="${esc(L(x).name)}" aria-pressed="${o===x}">${esc(L(x).name)}</button>`).join(""); };
+  ac.onclick=ev=>{ const b=ev.target.closest("[data-v]"); if(!b) return; ai.value=ai.value===b.dataset.v?"":b.dataset.v; const o=matchOcc(oi.value), a=matchArch(ai.value); if(o&&a&&o.arch!==a.arch) oi.value=""; draw(); };
+  oc.onclick=ev=>{ const b=ev.target.closest("[data-v]"); if(!b) return; oi.value=oi.value===b.dataset.v?"":b.dataset.v; const o=matchOcc(oi.value); if(o&&!ai.value.trim()){ const a=archList().find(x=>x.arch===o.arch); if(a) ai.value=L(a).name; } draw(); };
+  ai.addEventListener("input",draw); oi.addEventListener("input",draw); draw();
 }
+const archList=()=>ARCH_ORDER.map(k=>DATA.find(e=>e.type==="archetype"&&e.arch===k)).filter(Boolean);
+const normN=s=>(s||"").trim().toLowerCase();
+const matchArch=s=>{ const n=normN(s); return n?archList().find(a=>normN(a.sv.name)===n||normN(L(a).name)===n):null; };
+const matchOcc=s=>{ const n=normN(s); return n?DATA.find(e=>e.type==="occupation"&&!e.elite&&(normN(e.sv.name)===n||normN(L(e).name)===n)):null; };
+function charMeta(c){ const a=matchArch(c.archetype), o=matchOcc(c.occupation);
+  const bits=[]; if(c.race) bits.push(esc(c.race));
+  if(c.archetype) bits.push(a?`<button class="qchip ref" data-act="arch" data-id="${a.id}">${esc(c.archetype)}</button>`:esc(c.archetype));
+  if(c.occupation) bits.push(o?`<button class="qchip ref" data-act="occ" data-id="${o.id}">${esc(c.occupation)}</button>`:esc(c.occupation));
+  return bits.join(" · "); }
 function listEdit(c,key,i,title,fields,blank){
   const isNew=i<0; const v=isNew?{...blank}:c[key][i];
   formSheet(title,fields,v,o=>{ Object.assign(v,o);
