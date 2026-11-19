@@ -170,6 +170,18 @@ details.drawer[open]>summary .hint{visibility:hidden}
 .res .sub{font-size:.82rem;color:var(--muted)}
 .res .right{margin-left:auto;flex:none}
 .grouphead{font-family:var(--display);font-size:.95rem;color:var(--accent);padding:14px 2px 4px;border-bottom:1px solid var(--line)}
+button.grouphead{display:flex;align-items:baseline;gap:8px;width:100%;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;font-size:1.1rem}
+button.grouphead .hint{margin-left:auto;font-family:var(--body);font-size:.8rem;color:var(--muted)}
+.res .quote{font-size:.82rem;color:var(--muted);font-style:italic;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.pill.elite{border-color:#6a3a32;color:var(--accent)}
+button.pill{background:rgba(192,97,74,.12);border:1px solid #6a3a32;color:var(--text);font:inherit;font-size:.8rem;cursor:pointer}
+.occ .quote{font-style:italic;color:#c9c0ae;margin:0 0 12px}
+.occ dl{margin:14px 0 0;display:flex;flex-direction:column;gap:10px}
+.occ dt{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:3px}
+.occ dd{margin:0;line-height:1.9}
+.occ dd .ln{display:block}
+.occ .note{font-size:.85rem;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:12px 0 0}
+.qchip.ref{font-size:.88rem;padding:1px 9px;margin:1px 0}
 /* ability detail */
 .detail p{margin:0 0 .6em;max-width:68ch}
 .lvl{border-left:3px solid var(--line);padding:2px 0 2px 12px;margin:10px 0}
@@ -224,7 +236,7 @@ sv:{fromList:"Välj från listan",customW:"Eget vapen",customA:"Egen rustning",c
 loginTitle:"Logga in",loginHint:"Använd e-post och lösenord som du fått av den som driver appen.",email:"E-post",password:"Lösenord",signIn:"Logga in",badLogin:"Fel e-post eller lösenord.",noNet:"Ingen internetanslutning.",
 rulesErr:"Regeldata kunde inte laddas. Kontrollera anslutningen och ladda om sidan.",offline:"Kunde inte nå servern. Ändringar sparas på enheten och synkas när du är online igen.",
 install:"Installera som app",installHint:"iPhone/iPad: öppna sidan i Safari, tryck på Dela och välj Lägg till på hemskärmen. Dator: klicka på installera-ikonen i adressfältet i Chrome eller Edge. Logga in en gång i den installerade appen.",
-navChars:"Rollpersoner",navLib:"Bibliotek",libAbil:"Förmågor",libItems:"Utrustning",libJobs:"Yrken",libRaces:"Släkten",soon:"kommer snart",libJobsEmpty:"Här kommer arketyper, yrken och elityrken att listas.",libRacesEmpty:"Här kommer släktena att listas.",navSettings:"Inställningar",back:"Tillbaka",loading:"Laddar…",
+navChars:"Rollpersoner",navLib:"Bibliotek",libAbil:"Förmågor",libItems:"Utrustning",libJobs:"Yrken",libRaces:"Släkten",soon:"kommer snart",libJobsEmpty:"Här kommer arketyper, yrken och elityrken att listas.",jobsCommon:"Yrken",jobsElite:"Elityrken",elite:"Elityrke",aboutArch:"Om arketypen",occRace:"Förslag på släkte",occAbil:"Lämpliga förmågor",occReq:"Krav på förmågor",occOther:"Andra krav",occUnique:"Unika förmågor",occBoons:"Möjliga fördelar",occBurdens:"Tänkbara nackdelar",archAbility:"Arketypisk förmåga",archNote:"Kräver minst tre förmågor från arketypens lista (novisnivå räcker).",archAbils:"Arketypens förmågor",archOccs:"Yrken",eliteNote:"Rollpersonen måste ha samtliga kravförmågor, varav minst en på mästarnivå. Går inte att välja vid start.",archetype:"Arketyp",libRacesEmpty:"Här kommer släktena att listas.",navSettings:"Inställningar",back:"Tillbaka",loading:"Laddar…",
 newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",color:"Färg",
 save:"Spara",cancel:"Avbryt",del:"Radera",edit:"Redigera",add:"Lägg till",close:"Stäng",confirmDel:"Radera {x}? Det går inte att ångra.",
 tOverview:"Översikt",tAbilities:"Förmågor",tCombat:"Strid",tGear:"Utrustning",tNotes:"Anteckningar",
@@ -259,7 +271,7 @@ en:{fromList:"Choose from the list",customW:"Custom weapon",customA:"Custom armo
 loginTitle:"Sign in",loginHint:"Use the email and password you got from whoever runs the app.",email:"Email",password:"Password",signIn:"Sign in",badLogin:"Wrong email or password.",noNet:"No internet connection.",
 rulesErr:"The rules data could not be loaded. Check your connection and reload the page.",offline:"Could not reach the server. Changes are kept on this device and sync when you're back online.",
 install:"Install as an app",installHint:"iPhone/iPad: open the page in Safari, tap Share and choose Add to Home Screen. Computer: click the install icon in the address bar in Chrome or Edge. Sign in once in the installed app.",
-navChars:"Characters",navLib:"Library",libAbil:"Abilities",libItems:"Equipment",libJobs:"Occupations",libRaces:"Races",soon:"coming soon",libJobsEmpty:"Archetypes, occupations and elite occupations will be listed here.",libRacesEmpty:"Races will be listed here.",navSettings:"Settings",back:"Back",loading:"Loading…",
+navChars:"Characters",navLib:"Library",libAbil:"Abilities",libItems:"Equipment",libJobs:"Occupations",libRaces:"Races",soon:"coming soon",libJobsEmpty:"Archetypes, occupations and elite occupations will be listed here.",jobsCommon:"Occupations",jobsElite:"Elite occupations",elite:"Elite occupation",aboutArch:"About the archetype",occRace:"Suggested race",occAbil:"Suitable abilities",occReq:"Required abilities",occOther:"Other requirements",occUnique:"Unique abilities",occBoons:"Possible boons",occBurdens:"Possible burdens",archAbility:"Archetypal ability",archNote:"Requires at least three abilities from the archetype list (novice is enough).",archAbils:"Archetype abilities",archOccs:"Occupations",eliteNote:"The character must have all required abilities, at least one at master level. Cannot be chosen at character creation.",archetype:"Archetype",libRacesEmpty:"Races will be listed here.",navSettings:"Settings",back:"Back",loading:"Loading…",
 newChar:"New character",noChars:"No characters yet. Create your first one.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",color:"Colour",
 save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",add:"Add",close:"Close",confirmDel:"Delete {x}? This cannot be undone.",
 tOverview:"Overview",tAbilities:"Abilities",tCombat:"Combat",tGear:"Gear",tNotes:"Notes",
@@ -418,7 +430,19 @@ async function loadRules(){
     if(out.length){ setRules(out); try{ localStorage.setItem("sym.rules",JSON.stringify(out)); }catch(e){} }
   }catch(e){ if(!cached) throw e; }
 }
-function setRules(d){ DATA=d; BYID={}; QIDX=null; d.forEach(e=>BYID[e.id]=e); }
+function setRules(d){ DATA=d; BYID={}; QIDX=null; NIDX=null; d.forEach(e=>BYID[e.id]=e); }
+/* ---------- name links (chips for abilities etc. inside texts) ---------- */
+let NIDX=null;
+const LINK_PREF={boons:["boon"],burdens:["burden"]};
+function nameIndex(){ if(NIDX) return NIDX; const m={};
+  DATA.forEach(e=>{ if(!ABIL_TYPES.includes(e.type)) return; (m[e.sv.name]=m[e.sv.name]||[]).push(e); });
+  const names=Object.keys(m).sort((a,b)=>b.length-a.length).map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
+  NIDX={m,re:new RegExp("(?<![\\p{L}])("+names.join("|")+")(?![\\p{L}])","gu")}; return NIDX; }
+function pickRef(list,pref){ const order=pref||["ability","tradition","power","ritual","monstrous","trait","boon","burden"]; return [...list].sort((a,b)=>{const ia=order.indexOf(a.type), ib=order.indexOf(b.type); return (ia<0?99:ia)-(ib<0?99:ib);})[0]; }
+function linkify(text,opt={}){ if(!text) return ""; const {m,re}=nameIndex(); let out="",last=0;
+  text.replace(re,(hit,_n,off)=>{ if(opt.minLen&&hit.length<opt.minLen) return hit; const e=pickRef(m[hit],LINK_PREF[opt.field]);
+    out+=esc(text.slice(last,off))+`<button class="qchip ref" data-ref="${e.id}">${esc(hit)}</button>`; last=off+hit.length; return hit; });
+  return out+esc(text.slice(last)); }
 function setSync(s){ S.syncState=s; refreshStatus(); }
 const isTyping=()=>{const a=document.activeElement; return a && /INPUT|TEXTAREA|SELECT/.test(a.tagName);};
 function refreshStatus(){ const el=document.getElementById("syncStatus"); if(el) el.innerHTML=statusHtml(); }
@@ -570,7 +594,8 @@ function subNotes(c){
 }
 function viewLib(){ setTitle(t("navLib"),false);
   const tabs=`<div class="libtabs" role="tablist">${LIB_TABS.map(([k,l])=>`<button role="tab" data-libtab="${k}" aria-pressed="${P.tab===k}">${t(l)}</button>`).join("")}</div>`;
-  if(P.tab==="jobs"||P.tab==="races") return tabs+`<div class="empty" style="margin-top:16px">${t(P.tab==="jobs"?"libJobsEmpty":"libRacesEmpty")}</div>`;
+  if(P.tab==="jobs") return tabs+jobsHtml();
+  if(P.tab==="races") return tabs+`<div class="empty" style="margin-top:16px">${t("libRacesEmpty")}</div>`;
   return tabs+`<div class="pickwrap">${pickerHtml(null)}</div>`; }
 const INSTALL={
 sv:{intro:"Lägg appen på hemskärmen eller i datorn så öppnas den i ett eget fönster, som en vanlig app. Logga in en gång i den installerade appen – den har en egen inloggning, skild från webbläsaren.",
@@ -690,6 +715,43 @@ function openPicker(sec){
   el.addEventListener("click",ev=>{ const b=ev.target.closest('[data-act="detail"]'); if(b){ ITEM_SECS[sec]?openItemDetail(b.dataset.id,sec):openDetail(b.dataset.id); return; }
     const cb=ev.target.closest("[data-custom]"); if(cb){ closeAll(); customItem(cur(),cb.dataset.custom,-1); } });
 }
+
+/* ---------- occupations & archetypes ---------- */
+const ARCH_ORDER=["hunter","warrior","mystic","rogue"];
+const occsOf=k=>DATA.filter(e=>e.type==="occupation"&&e.arch===k).sort((a,b)=>a.sv.name.localeCompare(b.sv.name,"sv"));
+function jobsHtml(){
+  const f=P.jobs||"all"; const ch=(v,l)=>`<button data-jobs="${v}" aria-pressed="${f===v}">${l}</button>`;
+  const arches=ARCH_ORDER.map(k=>DATA.find(e=>e.type==="archetype"&&e.arch===k)).filter(Boolean);
+  if(!arches.length) return `<div class="empty" style="margin-top:16px">${t("libJobsEmpty")}</div>`;
+  let html=`<div class="filters" style="margin:0 -16px"><div class="chips"><span class="lab">${t("typ")}</span>${ch("all",t("all"))}${ch("common",t("jobsCommon"))}${ch("elite",t("jobsElite"))}</div></div><div class="results">`;
+  arches.forEach(a=>{ const list=occsOf(a.arch).filter(o=>f==="all"||(f==="elite")===!!o.elite); if(!list.length) return;
+    html+=`<button class="grouphead" data-act="arch" data-id="${a.id}">${esc(L(a).name)}<span class="hint">${t("aboutArch")} ›</span></button>`;
+    list.forEach(o=>{ const s=L(o); html+=`<button class="res" data-act="occ" data-id="${o.id}"><div style="min-width:0"><div class="nm">${esc(s.name)}</div>
+      <div class="quote">${esc(s.quote||"")}</div><div class="sub">${esc([o.sv.sub,o.ref].filter(Boolean).join(" · "))}</div></div>
+      ${o.elite?`<span class="right pill elite">${t("elite")}</span>`:""}</button>`; }); });
+  return html+`</div>`;
+}
+function fieldHtml(label,val,field){ if(!val) return "";
+  const lines=val.split("\n").map(l=>{ const m=l.match(/^([^:]{2,20}):\s(.*)$/); return `<span class="ln">${m?`<b>${esc(m[1])}:</b> ${linkify(m[2],{field})}`:linkify(l,{field})}</span>`; }).join("");
+  return `<div><dt>${label}</dt><dd>${lines}</dd></div>`; }
+function occHtml(o){ const s=L(o); const a=DATA.find(x=>x.type==="archetype"&&x.arch===o.arch);
+  return `<div class="occ"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px">
+    ${a?`<button class="pill" data-arch="${a.id}">${esc(L(a).name)} ›</button>`:""}${o.elite?`<span class="pill elite">${t("elite")}</span>`:""}${o.sv.sub?`<span class="pill">${esc(o.sv.sub)}</span>`:""}<span class="pill">${esc(o.ref)}</span>${lang==="en"?`<span class="pill">${t("svOnly")}</span>`:""}</div>
+    ${s.quote?`<p class="quote">${esc(s.quote)}</p>`:""}<div class="detail">${(s.text||[]).map(p=>`<p>${linkify(p,{minLen:5})}</p>`).join("")}</div>
+    <dl>${fieldHtml(t("occRace"),s.race)}${fieldHtml(t(o.elite?"occReq":"occAbil"),o.elite?s.req:s.abilities)}${fieldHtml(t("occOther"),s.other)}${fieldHtml(t("occUnique"),s.unique)}${fieldHtml(t("occBoons"),s.boons,"boons")}${fieldHtml(t("occBurdens"),s.burdens,"burdens")}</dl>
+    ${o.elite?`<p class="note">${t("eliteNote")}</p>`:""}</div>`; }
+function archHtml(a){ const s=L(a); const occs=occsOf(a.arch);
+  return `<div class="occ"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px"><span class="pill">${t("archetype")}</span><span class="pill">${esc(a.ref)}</span>${lang==="en"?`<span class="pill">${t("svOnly")}</span>`:""}</div>
+    <div class="detail">${(s.text||[]).map(p=>`<p>${linkify(p,{minLen:5})}</p>`).join("")}</div>
+    <dl>${fieldHtml(t("archAbility"),s.ability)}<p class="note" style="margin:0">${t("archNote")}</p>
+    <div><dt>${t("archAbils")}</dt><dd>${(s.abilities||[]).map(([k,v])=>`<span class="ln"><b>${esc(k)}:</b> ${linkify(v)}</span>`).join("")}</dd></div>
+    <div><dt>${t("archOccs")}</dt><dd>${occs.map(o=>`<button class="qchip ref" data-occ="${o.id}">${esc(L(o).name)}${o.elite?" ★":""}</button>`).join(" ")}</dd></div></dl></div>`; }
+function bindRefs(el){ el.addEventListener("click",ev=>{ const r=ev.target.closest("[data-ref],[data-occ],[data-arch]"); if(!r) return;
+  if(r.dataset.ref) openDetail(r.dataset.ref); else if(r.dataset.occ) openOcc(r.dataset.occ); else openArch(r.dataset.arch); }); }
+function openOcc(id){ const o=BYID[id]; if(!o) return;
+  bindRefs(sheet(`<div class="sheet-head"><h2>${esc(L(o).name)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div><div class="sheet-body">${occHtml(o)}</div>`,{tall:true,stack:true})); }
+function openArch(id){ const a=BYID[id]; if(!a) return;
+  bindRefs(sheet(`<div class="sheet-head"><h2>${esc(L(a).name)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div><div class="sheet-body">${archHtml(a)}</div>`,{tall:true,stack:true})); }
 
 /* ---------- ability detail ---------- */
 let detailLang=null;
@@ -844,6 +906,7 @@ const setLang=l=>{ lang=l; try{localStorage.setItem("sym.lang",l);}catch(e){} cl
 $("#langSv").onclick=()=>setLang("sv"); $("#langEn").onclick=()=>setLang("en");
 $("#main").addEventListener("click",ev=>{
   const qb=ev.target.closest("[data-qual]"); if(qb){ openItemDetail(qb.dataset.qual); return; }
+  const jf=ev.target.closest("[data-jobs]"); if(jf){ P.jobs=jf.dataset.jobs; render(); return; }
   const lt=ev.target.closest("[data-libtab]"); if(lt){ if(P.tab!==lt.dataset.libtab){ Object.assign(P,{tab:lt.dataset.libtab,q:"",type:"all",group:"all",book:"all",sort:lt.dataset.libtab==="items"?"group":"name"}); render(); $("#main").scrollTop=0; } return; }
   const b=ev.target.closest("[data-act]"); if(!b) return; const act=b.dataset.act; const c=cur();
   if(act==="open"){ S.charId=b.dataset.id; S.view="char"; S.sub="overview"; S.editStats=false; render(); $("#main").scrollTop=0; }
@@ -859,6 +922,8 @@ $("#main").addEventListener("click",ev=>{
   else if(act==="editA") customItem(c,"armors",+b.dataset.i);
   else if(act==="editG") customItem(c,"gear",+b.dataset.i);
   else if(act==="itemInfo") openItemDetail(b.dataset.ref);
+  else if(act==="occ") openOcc(b.dataset.id);
+  else if(act==="arch") openArch(b.dataset.id);
   else if(act==="editN"){ const i=+b.dataset.i; listEdit(c,"notes",i,t(i<0?"newNote":"note"),[["text",t("note"),"area"]],{text:"",date:Date.now()}); }
   else if(act==="lang") setLang(b.dataset.l);
   else if(act==="export") doExport();
