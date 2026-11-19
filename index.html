@@ -991,6 +991,7 @@ function elitePick(c){
 function eliteInfo(c){ const o=c.elite&&BYID[c.elite.ref]; if(!o) return; const n=L(o).name; const r=eliteCheck(c,o); const done=!!c.elite.done; const all=r.met===r.total;
   const li=i=>`<li><span class="mk ${i.manual?"man":i.ok?"ok":"no"}">${i.manual?"○":i.ok?"✓":"✗"}</span><span>${linkify(i.label)}${i.manual?` <span class="small muted">(${t("eliteManual")})</span>`:""}</span></li>`;
   const body=`<div class="occ"><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">${o.parent&&BYID[o.parent]?`<span class="pill elite">${esc(t("eliteFor",{x:L(BYID[o.parent]).name}))}</span>`:`<span class="pill elite">${t("elite")}</span>`}<span class="pill">${esc(o.ref)}</span>${done?"":`<span class="pill">${r.met} / ${r.total}</span>`}</div>
+    ${L(o).quote?`<p class="quote">${esc(L(o).quote)}</p>`:""}<div class="detail" style="margin-bottom:14px">${(L(o).text||[]).map(p=>`<p>${linkify(p,{minLen:5})}</p>`).join("")}</div>
     <dt>${t("eliteReqs")}</dt><ul class="reqlist">${r.items.map(li).join("")}</ul>
     ${o.sv.unique?`<dl>${fieldHtml(t("occUnique"),o.sv.unique)}</dl>`:""}
     ${done?"":`<p class="note">${t("eliteNeedAll")}</p>`}</div>`;
