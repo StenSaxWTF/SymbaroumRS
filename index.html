@@ -749,8 +749,8 @@ const BOOKS_ORDER=["GB","SH"];
 function racesHtml(){ const all=DATA.filter(e=>e.type==="race"); if(!all.length) return `<div class="empty" style="margin-top:16px">${t("libRacesEmpty")}</div>`;
   let html=`<div class="results" style="margin-top:6px">`;
   BOOKS_ORDER.forEach(b=>{ const lab=STR[lang].books[b]; const list=all.filter(e=>e.book===b).sort((x,y)=>L(x).name.localeCompare(L(y).name,"sv")); if(!list.length) return;
-    html+=`<div class="grouphead">${esc(lab)}</div>`+list.map(r=>{ const s=L(r); const first=(s.text&&s.text[0]||"").split(/(?<=[.!?])\s/)[0];
-      return `<button class="res" data-act="race" data-id="${r.id}"><div style="min-width:0"><div class="nm">${esc(s.name)}</div><div class="quote" style="font-style:normal">${esc(first)}</div><div class="sub">${esc(r.ref)}</div></div></button>`; }).join(""); });
+    html+=`<div class="grouphead">${esc(lab)}</div>`+list.map(r=>{ const s=L(r);
+      return `<button class="res" data-act="race" data-id="${r.id}"><div style="min-width:0"><div class="nm">${esc(s.name)}</div><div class="sub">${esc(r.ref)}</div></div></button>`; }).join(""); });
   return html+`</div>`; }
 function labPara(p,opt){ const m=p.match(/^([A-ZÅÄÖ][^:]{1,34}):\s(.+)$/s); if(m&&!/[.,;]/.test(m[1])) return `<p><b>${esc(m[1])}:</b> ${opt?linkify(m[2],opt):esc(m[2])}</p>`; return `<p>${opt?linkify(p,opt):esc(p)}</p>`; }
 function raceHtml(r){ const s=L(r);
