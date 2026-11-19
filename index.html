@@ -746,11 +746,11 @@ function openPicker(sec){
 }
 
 /* ---------- races ---------- */
-const BOOKS_ORDER=["GB","SH"];
+const BOOKS_ORDER=["GB","SH","MK"];
 function racesHtml(){ const all=DATA.filter(e=>e.type==="race"); if(!all.length) return `<div class="empty" style="margin-top:16px">${t("libRacesEmpty")}</div>`;
   return `<div class="filters" style="margin:0 -16px"><input class="t" type="search" id="rq" data-libsearch="races" placeholder="${t("search")}" value="${esc(P.rq||"")}" aria-label="${t("search")}"></div><div class="results" id="libres">${racesList()}</div>`; }
 function racesList(){ const all=DATA.filter(e=>e.type==="race"); const q=(P.rq||"").trim().toLowerCase(); let html="";
-  BOOKS_ORDER.forEach(b=>{ const lab=STR[lang].books[b]; const list=all.filter(e=>e.book===b&&textHit(e,q)).sort((x,y)=>L(x).name.localeCompare(L(y).name,"sv")); if(!list.length) return;
+  BOOKS_ORDER.forEach(b=>{ const lab=STR[lang].books[b]; const list=all.filter(e=>e.book===b&&(!e.hidden||q.includes(normN(e.sv.name)))&&textHit(e,q)).sort((x,y)=>L(x).name.localeCompare(L(y).name,"sv")); if(!list.length) return;
     html+=`<div class="grouphead">${esc(lab)}</div>`+list.map(r=>{ const s=L(r);
       return `<button class="res" data-act="race" data-id="${r.id}"><div style="min-width:0"><div class="nm">${esc(s.name)}</div><div class="sub">${esc(r.ref)}</div></div></button>`; }).join(""); });
   return html||`<div class="empty">${t("noHits")}</div>`; }
@@ -943,10 +943,15 @@ function formSheet(title,fields,vals,onSave,onDelete){
 }
 function editCharSheet(c){
   const isNew=!c; const v=c||blankChar();
-  const el=formSheet(isNew?t("newChar"):t("edit"),[["name",t("name"),"text"],["race",t("race"),"text"],["archetype",t("archetype"),"text",t("pickOrType")],["occupation",t("occupation"),"text",t("pickOrType")],["color",t("color"),"color"]],v,
+  const el=formSheet(isNew?t("newChar"):t("edit"),[["name",t("name"),"text"],["race",t("race"),"text",t("pickOrType")],["archetype",t("archetype"),"text",t("pickOrType")],["occupation",t("occupation"),"text",t("pickOrType")],["color",t("color"),"color"]],v,
    o=>{ Object.assign(v,o); if(isNew){ S.chars.push(v); S.charId=v.id; S.view="char"; S.sub="overview"; } touch(v); render(); },
    isNew?null:()=>confirmSheet(t("confirmDel",{x:v.name||"—"}),()=>{ S.chars=S.chars.filter(x=>x!==v); saveLocal(); dirty.add(v.id); saveDirty(); flush(v.id); closeAll(); S.view="chars"; render(); }));
   // suggestion chips for archetype and occupation (free text still allowed)
+  const ri=el.querySelector("#f_race");
+  if(ri&&raceList().length){ const rc=document.createElement("div"); rc.className="chips wrap pickchips"; rc.id="pc_race"; ri.closest(".f").appendChild(rc);
+    const drawR=()=>{ const r=matchRace(ri.value); rc.innerHTML=raceList().map(x=>`<button type="button" data-v="${esc(L(x).name)}" aria-pressed="${r===x}">${esc(L(x).name)}</button>`).join(""); };
+    rc.onclick=ev=>{ const b=ev.target.closest("[data-v]"); if(!b) return; ri.value=ri.value===b.dataset.v?"":b.dataset.v; drawR(); };
+    ri.addEventListener("input",drawR); drawR(); }
   const ai=el.querySelector("#f_archetype"), oi=el.querySelector("#f_occupation"); if(!ai||!archList().length) return;
   const mk=(inp,id)=>{ const d=document.createElement("div"); d.className="chips wrap pickchips"; d.id=id; inp.closest(".f").appendChild(d); return d; };
   const ac=mk(ai,"pc_arch"), oc=mk(oi,"pc_occ");
@@ -1028,12 +1033,15 @@ function eliteInfo(c){ const o=c.elite&&BYID[c.elite.ref]; if(!o) return; const 
     if(id==="eshow") openOcc(o.id); else if(id==="echg") elitePick(c);
     else if(id==="einit"&&all){ c.elite.done=true; touch(c); closeAll(); render(); toast(t("eliteDoneMsg",{x:c.name||n})); }
     else if(id==="eundo"){ c.elite.done=false; touch(c); closeAll(); render(); } }); }
+const raceList=()=>DATA.filter(e=>e.type==="race"&&!e.hidden).sort((a,b)=>L(a).name.localeCompare(L(b).name,"sv"));
+const matchRace=s=>{ const n=normN(s); return n?DATA.find(e=>e.type==="race"&&(normN(e.sv.name)===n||normN(L(e).name)===n)):null; };
 const archList=()=>ARCH_ORDER.map(k=>DATA.find(e=>e.type==="archetype"&&e.arch===k)).filter(Boolean);
 const normN=s=>(s||"").trim().toLowerCase();
 const matchArch=s=>{ const n=normN(s); return n?archList().find(a=>normN(a.sv.name)===n||normN(L(a).name)===n):null; };
 const matchOcc=s=>{ const n=normN(s); return n?DATA.find(e=>e.type==="occupation"&&!e.elite&&(normN(e.sv.name)===n||normN(L(e).name)===n)):null; };
 function charMeta(c){ const a=matchArch(c.archetype), o=matchOcc(c.occupation);
-  const bits=[]; if(c.race) bits.push(esc(c.race));
+  const bits=[]; const r=matchRace(c.race);
+  if(c.race) bits.push(r?`<button class="qchip ref" data-act="race" data-id="${r.id}">${esc(c.race)}</button>`:esc(c.race));
   if(c.archetype) bits.push(a?`<button class="qchip ref" data-act="arch" data-id="${a.id}">${esc(c.archetype)}</button>`:esc(c.archetype));
   if(c.occupation) bits.push(o?`<button class="qchip ref" data-act="occ" data-id="${o.id}">${esc(c.occupation)}</button>`:esc(c.occupation));
   return bits.join(" · "); }
