@@ -448,15 +448,29 @@ async function pull(){
   }catch(e){ setSync("offline"); }
   finally{ pulling=false; }
 }
+/* Rules cache: IndexedDB (localStorage is too small for ~1 MB of rules). Downloaded only when rules_version() changes. */
+const IDB={ db:null,
+  open(){ if(this.db) return this.db; this.db=new Promise((ok,no)=>{ try{ const r=indexedDB.open("symbaroum",1);
+    r.onupgradeneeded=()=>r.result.createObjectStore("kv"); r.onsuccess=()=>ok(r.result); r.onerror=()=>no(r.error); }catch(e){ no(e); } }); return this.db; },
+  async get(k){ const db=await this.open(); return new Promise((ok,no)=>{ const q=db.transaction("kv").objectStore("kv").get(k); q.onsuccess=()=>ok(q.result); q.onerror=()=>no(q.error); }); },
+  async set(k,v){ const db=await this.open(); return new Promise((ok,no)=>{ const tx=db.transaction("kv","readwrite"); tx.objectStore("kv").put(v,k); tx.oncomplete=()=>ok(); tx.onerror=()=>no(tx.error); }); } };
 async function loadRules(){
-  let cached=null; try{ cached=JSON.parse(localStorage.getItem("sym.rules")||"null"); }catch(e){}
-  if(cached&&cached.length) setRules(cached);
-  try{
-    const out=[]; for(let from=0;;from+=1000){ const r=await sb.from("rules").select("data").range(from,from+999); if(r.error) throw r.error; out.push(...r.data.map(x=>x.data)); if(r.data.length<1000) break; }
-    if(out.length){ setRules(out); try{ localStorage.setItem("sym.rules",JSON.stringify(out)); }catch(e){} }
-  }catch(e){ if(!cached) throw e; }
+  let cached=null;
+  try{ const c=await IDB.get("rules"); if(c&&Array.isArray(c.data)) cached=c; }catch(e){}
+  if(!cached){ try{ const old=JSON.parse(localStorage.getItem("sym.rules")||"null"); if(Array.isArray(old)&&old.length) cached={ver:null,data:old}; }catch(e){} }
+  try{ localStorage.removeItem("sym.rules"); }catch(e){}
+  if(cached&&cached.data.length){ setRules(cached.data); refreshRules(cached).catch(()=>{}); return; }
+  await refreshRules(null);
 }
-function setRules(d){ DATA=d; BYID={}; QIDX=null; NIDX=null; d.forEach(e=>BYID[e.id]=e); }
+async function refreshRules(cached){
+  let ver=null; const v=await sb.rpc("rules_version"); if(!v.error) ver=v.data;
+  if(cached&&ver&&cached.ver===ver) return;
+  const out=[]; for(let from=0;;from+=1000){ const r=await sb.from("rules").select("data").order("id").range(from,from+999); if(r.error) throw r.error; out.push(...r.data.map(x=>x.data)); if(r.data.length<1000) break; }
+  if(!out.length) return;
+  setRules(out); try{ await IDB.set("rules",{ver,data:out}); }catch(e){}
+  if(cached && S.user && !document.querySelector("#layer .scrim") && !isTyping()) render();
+}
+function setRules(d){ DATA=d; BYID={}; QIDX=null; NIDX=null; d.forEach(e=>{ if(!e.en) e.en=e.sv; BYID[e.id]=e; }); }
 /* ---------- name links (chips for abilities etc. inside texts) ---------- */
 let NIDX=null;
 const LINK_PREF={boons:["boon"],burdens:["burden"]};
