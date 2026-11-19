@@ -1034,7 +1034,8 @@ function eliteInfo(c){ const o=c.elite&&BYID[c.elite.ref]; if(!o) return; const 
     else if(id==="einit"&&all){ c.elite.done=true; touch(c); closeAll(); render(); toast(t("eliteDoneMsg",{x:c.name||n})); }
     else if(id==="eundo"){ c.elite.done=false; touch(c); closeAll(); render(); } }); }
 const raceList=()=>DATA.filter(e=>e.type==="race"&&!e.hidden).sort((a,b)=>L(a).name.localeCompare(L(b).name,"sv"));
-const matchRace=s=>{ const n=normN(s); return n?DATA.find(e=>e.type==="race"&&(normN(e.sv.name)===n||normN(L(e).name)===n)):null; };
+const RACE_ALIAS={"barbarättad människa":"Barbar","barbarättad":"Barbar","barbarer":"Barbar","ambrisk människa":"Ambrier","ambrisk":"Ambrier"};
+const matchRace=s=>{ let n=normN(s); if(RACE_ALIAS[n]) n=normN(RACE_ALIAS[n]); return n?DATA.find(e=>e.type==="race"&&(normN(e.sv.name)===n||normN(L(e).name)===n)):null; };
 const archList=()=>ARCH_ORDER.map(k=>DATA.find(e=>e.type==="archetype"&&e.arch===k)).filter(Boolean);
 const normN=s=>(s||"").trim().toLowerCase();
 const matchArch=s=>{ const n=normN(s); return n?archList().find(a=>normN(a.sv.name)===n||normN(L(a).name)===n):null; };
