@@ -810,7 +810,6 @@ function openDetail(id,ownedIdx){
     if(owned){ const lvBtns=maxRanks(e)>1?`<div class="row" style="gap:6px;margin-right:auto"><span class="small muted">${t("ranks")}</span><div class="seg" role="group">${[1,2,3].slice(0,maxRanks(e)).map(n=>`<button data-setrank="${n}" aria-pressed="${(owned.ranks||1)===n}">${n} <span class="small">(+${n})</span></button>`).join("")}</div></div>`:hasLevels(e)?`<div class="seg" role="group" style="margin-right:auto">${[1,2,3].map(n=>`<button data-setlv="${n}" aria-pressed="${(owned.level||1)===n}">${t(["","novice","adept","master"][n])}</button>`).join("")}</div>`:"";
       return `${lvBtns}<label class="row small muted" style="gap:6px"><input type="checkbox" id="freeChk" ${owned.free?"checked":""}> ${t("free")}</label>
         <button class="btn danger sm" data-remove>${t("remove")}</button>`; }
-    if(!inAdd) return "";
     if(hasLevels(e)) return [1,2,3].map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="${n}">+ ${t(["","novice","adept","master"][n])} <span class="small">(${[0,10,30,60][n]})</span></button>`).join("");
     if(maxRanks(e)>1) return [1,2,3].slice(0,maxRanks(e)).map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="0" data-rank="${n}">+ ${n}× <span class="small">(${5*n} XP)</span></button>`).join("");
     return `<button class="btn primary" data-addlv="0">+ ${t("add")} <span class="small">(${costOf(e,{})} XP)</span></button>`;
@@ -821,7 +820,8 @@ function openDetail(id,ownedIdx){
     const b=ev.target.closest("button,input"); if(!b) return;
     if(b.dataset.dl){ detailLang=b.dataset.dl; el.querySelector("#dbody").innerHTML=detailHtml(e,owned); return; }
     if(b.dataset.addlv!==undefined){ const o={ref:e.id,level:+b.dataset.addlv||1}; if(b.dataset.rank) o.ranks=+b.dataset.rank; c.abilities.push(o); touch(c); closeTop(); toast(t("added",{x:nameOf(e)}));
-      const pw=document.querySelector("#layer .pickwrap"); if(pw) renderResults(pw.closest(".sheet"),P.sec); render(); return; }
+      const pw=document.querySelector("#layer .pickwrap"); if(pw) renderResults(pw.closest(".sheet"),P.sec); render();
+      if(document.querySelector("#layer [data-eliteinfo]")){ closeAll(); eliteInfo(c); } return; }
     if(b.dataset.setlv){ owned.level=+b.dataset.setlv; touch(c); el.querySelectorAll("[data-setlv]").forEach(x=>x.setAttribute("aria-pressed",x===b)); el.querySelector("#dbody").innerHTML=detailHtml(e,owned); render(); return; }
     if(b.dataset.setrank){ owned.ranks=+b.dataset.setrank; touch(c); el.querySelectorAll("[data-setrank]").forEach(x=>x.setAttribute("aria-pressed",x===b)); render(); return; }
     if(b.id==="freeChk"){ owned.free=b.checked; touch(c); render(); return; }
@@ -996,7 +996,7 @@ function eliteInfo(c){ const o=c.elite&&BYID[c.elite.ref]; if(!o) return; const 
     ${o.sv.unique?`<dl>${fieldHtml(t("occUnique"),o.sv.unique)}</dl>`:""}
     ${done?"":`<p class="note">${t("eliteNeedAll")}</p>`}</div>`;
   const foot=`<button class="btn" id="eshow" style="margin-right:auto">${t("eliteShow")}</button>${done?`<button class="btn" id="eundo">${t("eliteUndo")}</button>`:`<button class="btn" id="echg">${t("eliteChange")}</button><button class="btn primary" id="einit" ${all?"":"disabled"}>★ ${t("eliteInit")}</button>`}`;
-  const el=sheet(`<div class="sheet-head"><h2 style="display:flex;align-items:center;gap:8px"><span style="color:#d9b25f;display:flex">${eliteIcon(o.id)}</span>${esc(done?n:t("eliteAsp",{x:n}))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div><div class="sheet-body">${body}</div><div class="sheet-foot">${foot}</div>`,{tall:true,stack:true});
+  const el=sheet(`<div class="sheet-head"><h2 style="display:flex;align-items:center;gap:8px"><span style="color:#d9b25f;display:flex">${eliteIcon(o.id)}</span>${esc(done?n:t("eliteAsp",{x:n}))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div><div class="sheet-body" data-eliteinfo>${body}</div><div class="sheet-foot">${foot}</div>`,{tall:true,stack:true});
   bindRefs(el);
   el.addEventListener("click",ev=>{ const id=ev.target.closest("button")?.id;
     if(id==="eshow") openOcc(o.id); else if(id==="echg") elitePick(c);
