@@ -92,6 +92,13 @@ nav.tabs button[aria-current="page"] svg{color:var(--accent)}
 @media (min-width:560px){.attrs{grid-template-columns:repeat(4,1fr)}}
 .attr{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
 .attr .name{font-size:.88rem;color:var(--muted)}
+.tog{display:flex;align-items:center;gap:14px;justify-content:space-between}
+.tog .tx{display:flex;flex-direction:column;gap:2px}
+input.switch{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);position:relative;cursor:pointer;transition:background .15s}
+input.switch::before{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--muted);transition:transform .15s,background .15s}
+input.switch:checked{background:var(--accent);border-color:var(--accent)}
+input.switch:checked::before{transform:translateX(18px);background:var(--accent-ink)}
+.hbcreate{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .excgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .excgrid button{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 4px;font-size:.85rem;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .excgrid button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
@@ -271,7 +278,7 @@ navChars:"Rollpersoner",navLib:"Bibliotek",libAbil:"Förmågor",libItems:"Utrust
 newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",noHits:"Inga träffar.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",pickOrType:"Välj nedan eller skriv eget",eliteGoal:"Elityrke",eliteAsp:"Aspirerande {x}",elitePickT:"Välj elityrke att sträva mot",eliteClear:"Ta bort mål",eliteShow:"Visa elityrket",eliteChange:"Byt",eliteInit:"Markera som invigd",eliteUndo:"Ångra invigning",eliteNeedAll:"När alla krav är uppfyllda behövs ett rollspelat inval – markera sedan rollpersonen som invigd.",eliteDoneT:"Invigd {x}",eliteMaster:"Minst en av kravförmågorna på mästarnivå",eliteManual:"kontrollera själv",eliteOther:"Övrigt",eliteReqs:"Krav",eliteDoneMsg:"{x} är nu invigd!",eliteGeneral:"Övriga",color:"Färg",
 save:"Spara",cancel:"Avbryt",del:"Radera",edit:"Redigera",add:"Lägg till",close:"Stäng",confirmDel:"Radera {x}? Det går inte att ångra.",
 tOverview:"Översikt",tAbilities:"Förmågor",tCombat:"Strid",tGear:"Utrustning",tNotes:"Anteckningar",
-attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",excPick:"Vilket karaktärsdrag?",excAllTaken:"Alla karaktärsdrag har redan förmågan.",excName:"Exceptionellt karaktärsdrag",excEditHint:"Här ändrar du grundvärdena (summa 80). +n kommer från Exceptionellt karaktärsdrag och läggs på automatiskt.",
+hbTitle:"Homebrew",hbIntro:"Husregler och egna förmågor, krafter, särdrag, fördelar och nackdelar.",hbOpen:"Öppna homebrew",hbRules:"Regelvarianter",hbContent:"Homebrew-innehåll",hbCreate:"Skapa homebrew",hbMine:"Mina homebrew",hbNone:"Du har inte skapat något ännu.",hbK_ability:"Förmåga",hbK_mystic:"Kraft / ritual",hbK_trait:"Särdrag",hbK_boon:"Fördel",hbK_burden:"Nackdel",hbNewT:"Ny homebrew: {x}",hbEditT:"Redigera homebrew",hbDesc:"Beskrivning",hbLevels:"Har nivåer (Novis, Gesäll, Mästare)",hbRanks:"Kan tas flera gånger (upp till 3)",hbPublic:"Publik",hbPublicHint:"Publik homebrew syns för andra användare som har slagit på Visa publicerade homebrew-tillägg.",hbNeedName:"Ge den ett namn.",hbNeedNovice:"Fyll i texten för Novis.",hbSaved:"{x} sparad",hbDeleted:"{x} borttagen",hbSaveErr:"Det gick inte att spara. Är du uppkopplad?",hbSetOffline:"Inställningen sparades bara på den här enheten (ingen uppkoppling).",hbConfirmDel:"Ta bort {x}? Rollpersoner som har den tappar den.",hbOwnTag:"Egen",hbOfficialTag:"Officiell",hbPublicTag:"Publik",hbTypeT:"Typ",hbOffCount:"Officiella tillägg: {n}",eliteAltReq:"Majoriteten av övriga kravförmågor minst på gesällnivå ({have} av minst {need})",attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",excPick:"Vilket karaktärsdrag?",excAllTaken:"Alla karaktärsdrag har redan förmågan.",excName:"Exceptionellt karaktärsdrag",excEditHint:"Här ändrar du grundvärdena (summa 80). +n kommer från Exceptionellt karaktärsdrag och läggs på automatiskt.",
 accurate:"Träffsäker",cunning:"Listig",discreet:"Diskret",persuasive:"Övertygande",quick:"Kvick",resolute:"Viljestark",strong:"Stark",vigilant:"Vaksam",
 toughness:"Tålighet",pain:"Smärtgräns",defense:"Försvar",corrThr:"Korruptionströskel",abomThr:"Styggelsetröskel",
 current:"Nu",damage:"Skada",tempCorr:"Temporär korruption",permCorr:"Permanent korruption",totalCorr:"Total korruption",
@@ -294,7 +301,7 @@ dataTitle:"Om regeldata",dataBody:"312 poster från Grundbok, Spelarens handbok,
 exportDone:"Säkerhetskopian sparad",exportFail:"Nedladdningen avbröts. Använd Kopiera som text i stället.",
 types:{ability:"Förmåga",tradition:"Tradition",power:"Kraft",ritual:"Ritual",trait:"Särdrag",monstrous:"Monstruöst särdrag",boon:"Fördel",burden:"Nackdel",weapon:"Vapen",armor:"Rustning",quality:"Kvalitet",gear:"Utrustning",property:"Annan egendom"},
 typesP:{ability:"Förmågor",tradition:"Traditioner",power:"Krafter",ritual:"Ritualer",trait:"Särdrag",monstrous:"Monstruösa särdrag",boon:"Fördelar",burden:"Nackdelar",weapon:"Vapen",armor:"Rustningar",quality:"Kvaliteter",gear:"Utrustning",property:"Andra egendomar"},
-books:{GB:"Grundbok",SH:"Spelarens handbok",MK:"Monsterkodex",KORT:"Förmågekort"},
+books:{GB:"Grundbok",SH:"Spelarens handbok",MK:"Monsterkodex",KORT:"Förmågekort",HB:"Homebrew"},
 saveErr:"Kunde inte spara till kontot. Ändringen finns kvar i den här webbläsaren.",
 xpCostHint:"Kostnad",
 },
@@ -306,7 +313,7 @@ navChars:"Characters",navLib:"Library",libAbil:"Abilities",libItems:"Equipment",
 newChar:"New character",noChars:"No characters yet. Create your first one.",noHits:"No matches.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",pickOrType:"Pick below or type your own",eliteGoal:"Elite occupation",eliteAsp:"Aspiring {x}",elitePickT:"Choose an elite occupation to strive for",eliteClear:"Remove goal",eliteShow:"Show the elite occupation",eliteChange:"Change",eliteInit:"Mark as initiated",eliteUndo:"Undo initiation",eliteNeedAll:"When every requirement is met, a roleplayed initiation is needed – then mark the character as initiated.",eliteDoneT:"Initiated {x}",eliteMaster:"At least one required ability at master level",eliteManual:"check yourself",eliteOther:"Other",eliteReqs:"Requirements",eliteDoneMsg:"{x} is now initiated!",eliteGeneral:"Other",color:"Colour",
 save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",add:"Add",close:"Close",confirmDel:"Delete {x}? This cannot be undone.",
 tOverview:"Overview",tAbilities:"Abilities",tCombat:"Combat",tGear:"Gear",tNotes:"Notes",
-attributes:"Attributes",attrSum:"Total {n} of 80",excPick:"Which attribute?",excAllTaken:"Every attribute already has this ability.",excName:"Exceptional Attribute",excEditHint:"These are the base values (total 80). +n comes from Exceptional Attribute and is added automatically.",
+hbTitle:"Homebrew",hbIntro:"House rules and your own abilities, powers, traits, boons and burdens.",hbOpen:"Open homebrew",hbRules:"Rule variants",hbContent:"Homebrew content",hbCreate:"Create homebrew",hbMine:"My homebrew",hbNone:"You haven't created anything yet.",hbK_ability:"Ability",hbK_mystic:"Power / ritual",hbK_trait:"Trait",hbK_boon:"Boon",hbK_burden:"Burden",hbNewT:"New homebrew: {x}",hbEditT:"Edit homebrew",hbDesc:"Description",hbLevels:"Has levels (Novice, Adept, Master)",hbRanks:"Can be taken several times (up to 3)",hbPublic:"Public",hbPublicHint:"Public homebrew is visible to other users who have turned on Show published homebrew.",hbNeedName:"Give it a name.",hbNeedNovice:"Fill in the Novice text.",hbSaved:"{x} saved",hbDeleted:"{x} deleted",hbSaveErr:"Could not save. Are you online?",hbSetOffline:"The setting was only saved on this device (offline).",hbConfirmDel:"Delete {x}? Characters that have it will lose it.",hbOwnTag:"Own",hbOfficialTag:"Official",hbPublicTag:"Public",hbTypeT:"Type",hbOffCount:"Official additions: {n}",eliteAltReq:"Most of the other required abilities at adept or higher ({have} of at least {need})",attributes:"Attributes",attrSum:"Total {n} of 80",excPick:"Which attribute?",excAllTaken:"Every attribute already has this ability.",excName:"Exceptional Attribute",excEditHint:"These are the base values (total 80). +n comes from Exceptional Attribute and is added automatically.",
 accurate:"Accurate",cunning:"Cunning",discreet:"Discreet",persuasive:"Persuasive",quick:"Quick",resolute:"Resolute",strong:"Strong",vigilant:"Vigilant",
 toughness:"Toughness",pain:"Pain Threshold",defense:"Defense",corrThr:"Corruption Threshold",abomThr:"Abomination Threshold",
 current:"Now",damage:"Damage",tempCorr:"Temporary corruption",permCorr:"Permanent corruption",totalCorr:"Total corruption",
@@ -329,7 +336,7 @@ dataTitle:"About the rules data",dataBody:"312 entries from the Core Rulebook, A
 exportDone:"Backup saved",exportFail:"The download was cancelled. Use Copy as text instead.",
 types:{ability:"Ability",tradition:"Tradition",power:"Power",ritual:"Ritual",trait:"Trait",monstrous:"Monstrous trait",boon:"Boon",burden:"Burden",weapon:"Weapon",armor:"Armour",quality:"Quality",gear:"Equipment",property:"Other property"},
 typesP:{ability:"Abilities",tradition:"Traditions",power:"Powers",ritual:"Rituals",trait:"Traits",monstrous:"Monstrous traits",boon:"Boons",burden:"Burdens",weapon:"Weapons",armor:"Armour",quality:"Qualities",gear:"Equipment",property:"Other property"},
-books:{GB:"Core Rulebook",SH:"Advanced Player's Guide",MK:"Monster Codex",KORT:"Ability cards"},
+books:{GB:"Core Rulebook",SH:"Advanced Player's Guide",MK:"Monster Codex",KORT:"Ability cards",HB:"Homebrew"},
 saveErr:"Could not save to your account. The change is kept in this browser.",
 xpCostHint:"Cost",
 }};
@@ -393,10 +400,11 @@ function itemLine(e){ const it=e.item||{};
   if(isGearT(e.type)) return [it.cat, it.cost].filter(Boolean).join(" · ");
   return [it.sub, it.dmg, it.quals&&it.quals!=="Speciell"?it.quals:"", it.cost].filter(Boolean).join(" · "); }
 /* boons whose text says they can be acquired several times (max three) */
-const maxRanks=e=>{ if(e._mr!==undefined) return e._mr;
+const maxRanks=e=>{ if(e._mr!==undefined) return e._mr; if(e.hb) return e._mr=e.hb.ranks?3:1;
   const txt=[e.sv.desc,e.sv.novice,e.en.desc,e.en.novice].join(" ");
   return e._mr=(e.type==="boon"&&/kan införskaffas flera gånger|can be acquired multiple times/i.test(txt))?3:1; };
 function costOf(e,o){ if(o.free) return 0;
+  if(hasLevels(e)&&(e.type==="boon"||e.type==="burden")) return (e.type==="burden"?-5:5)*(o.level||1);
   if(hasLevels(e)) return [0,10,30,60][o.level||1];
   if(e.type==="boon") return 5*Math.min(maxRanks(e),o.ranks||1);
   return {ritual:10,boon:5,burden:-5,trait:0,monstrous:10}[e.type]??0; }
@@ -408,7 +416,7 @@ function groupLine(e){
   if(e.race) bits.push(t("race_")+": "+(lang==="en"?(RACE_EN[e.race]||e.race):e.race));
   return bits.join(" · ");
 }
-function bookLine(e){ return (STR[lang].books[e.book]||e.book)+(e.ref?" · "+e.ref:""); }
+function bookLine(e){ if(e.hb) return t("hbTitle")+" · "+hbTag(e); return (STR[lang].books[e.book]||e.book)+(e.ref?" · "+e.ref:""); }
 
 /* ---------- state + storage (Supabase) ---------- */
 const S={chars:[], view:"chars", charId:null, sub:"overview", syncState:"connecting", user:null};
@@ -481,13 +489,13 @@ async function refreshRules(cached){
   setRules(out); try{ await IDB.set("rules",{ver,data:out}); }catch(e){}
   if(cached && S.user && !document.querySelector("#layer .scrim") && !isTyping()) render();
 }
-function setRules(d){ DATA=d; BYID={}; QIDX=null; NIDX=null; d.forEach(e=>{ if(!e.en) e.en=e.sv; BYID[e.id]=e; }); }
+function setRules(d){ RULES=d; d.forEach(e=>{ if(!e.en) e.en=e.sv; }); rebuildData(); }
 /* ---------- name links (chips for abilities etc. inside texts) ---------- */
 let NIDX=null;
 const LINK_PREF={boons:["boon"],burdens:["burden"]};
 const NAME_ALIAS={"Regenerera":"Regeneration","Teleportera":"Teleportering","Tankestöt":"Sinnesstöt","Häxkonst":"Häxkonster","Levande fort":"Levande fästning","Förhäxad terräng":"Förhäxande landskap","Priviligierad":"Privilegierad","Snabbeld":"Snabbskytte"};
 function nameIndex(){ if(NIDX) return NIDX; const m={};
-  DATA.forEach(e=>{ if(!ABIL_TYPES.includes(e.type)) return; (m[e.sv.name]=m[e.sv.name]||[]).push(e); });
+  DATA.forEach(e=>{ if(!ABIL_TYPES.includes(e.type)||e.hb) return; (m[e.sv.name]=m[e.sv.name]||[]).push(e); });
   Object.entries(NAME_ALIAS).forEach(([a,n])=>{ if(m[n]&&!m[a]) m[a]=m[n]; });
   const names=Object.keys(m).sort((a,b)=>b.length-a.length).map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   NIDX={m,re:new RegExp("(?<![\\p{L}])("+names.join("|")+")(?![\\p{L}])","gu")}; return NIDX; }
@@ -525,12 +533,13 @@ let lastViewKey="";
 function render(){
   applyStaticT();
   const vk=S.view+"|"+(S.view==="char"?S.charId+"|"+S.sub:"");
-  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",(b.dataset.nav===S.view||(S.view==="char"&&b.dataset.nav==="chars"))?"page":"false"));
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-current",(b.dataset.nav===S.view||(S.view==="char"&&b.dataset.nav==="chars")||(S.view==="homebrew"&&b.dataset.nav==="settings"))?"page":"false"));
   const m=$("#main");
   if(S.view==="chars") m.innerHTML=viewChars();
   else if(S.view==="char") m.innerHTML=viewChar();
   else if(S.view==="lib") m.innerHTML=viewLib();
   else if(S.view==="settings") m.innerHTML=viewSettings();
+  else if(S.view==="homebrew") m.innerHTML=viewHomebrew();
   if(S.view==="lib"&&(P.tab==="abil"||P.tab==="items")) bindPicker(m,null);
   if(vk!==lastViewKey){ m.scrollTop=0; window.scrollTo(0,0); lastViewKey=vk; }
 }
@@ -682,6 +691,7 @@ function viewSettings(){
   <div class="card stack"><h3>${t("account")}</h3><div class="small">${t("signedInAs")} <b>${esc(S.user?S.user.email:"")}</b></div>
     <div class="status" id="syncStatus">${statusHtml()}</div>
     <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="changePw">${t("changePw")}</button><button class="btn danger" data-act="signOut">${t("signOut")}</button></div></div>
+  <div class="card stack"><h3>${t("hbTitle")}</h3><p class="small muted" style="margin:0">${t("hbIntro")}</p><div><button class="btn" data-act="hbOpen">${t("hbOpen")} ›</button></div></div>
   ${installDrawer()}
   <div class="card stack"><h3>${t("backup")}</h3>
     <div class="row" style="flex-wrap:wrap"><button class="btn" data-act="export">${t("exportBtn")}</button><button class="btn" data-act="copyAll">${t("copyBtn")}</button></div>
@@ -710,7 +720,7 @@ function pickerHtml(sec){
     <input class="t" type="search" id="pq" placeholder="${t("search")}" value="${esc(P.q)}" aria-label="${t("search")}">
     ${types.length>1?`<div class="chips"><span class="lab">${t("typ")}</span>${chip("type","all",t("all"))}${types.map(x=>chip("type",x,STR[lang].typesP[x])).join("")}</div>`:""}
     ${groupRow}
-    ${showBook?`<div class="chips"><span class="lab">${t("book")}</span>${chip("book","all",t("all"))}${["GB","SH","MK","KORT"].map(x=>chip("book",x,STR[lang].books[x])).join("")}</div>`:""}
+    ${showBook?`<div class="chips"><span class="lab">${t("book")}</span>${chip("book","all",t("all"))}${["GB","SH","MK","KORT"].concat(DATA.some(e=>e.book==="HB")?["HB"]:[]).map(x=>chip("book",x,STR[lang].books[x])).join("")}</div>`:""}
     <div class="row small"><span class="muted" id="pcount"></span><label class="row muted" style="margin-left:auto;gap:6px">${t("sort")}
       <select class="t" id="psort" style="width:auto;padding:4px 8px">${[["name","sortName"],["group","sortGroup"],["book","sortBook"]].map(([v,l])=>`<option value="${v}" ${P.sort===v?"selected":""}>${t(l)}</option>`).join("")}</select></label></div>
   </div><div class="results" id="pres" style="${sec?"padding:0 16px":""}"></div>`;
@@ -843,9 +853,9 @@ function detailHtml(e,owned){
   const levels=hasLevels(e)?[1,2,3].map(n=>{const f=["","novice","adept","master"][n]; const on=owned&&(owned.level||1)>=n;
      return `<div class="lvl ${on?"on":""}"><h4>${t(f)} ${on?`<span class="pill lv">✓</span>`:""}</h4>${pick(f)}</div>`;}).join(""):"";
   const extra=(e.sv.extra&&dl!=="en")?`<div class="lvl"><h4>${lang==="en"?"Expanded (APG)":"Utökning (SH)"}</h4>${paras(e.sv.extra)}</div>`:"";
-  return `<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"><span class="pill">${esc(STR[lang].types[e.type])}</span>${groupLine(e)?`<span class="pill">${esc(groupLine(e))}</span>`:""}<span class="pill">${esc(bookLine(e))}</span></div>
-   <div class="row" style="margin-bottom:12px"><span class="small muted">${t("showLang")}</span><div class="seg" role="group">
-     ${[["sv","SV"],["en","EN"],["both",t("both")]].map(([v,l])=>`<button data-dl="${v}" aria-pressed="${dl===v}">${l}</button>`).join("")}</div></div>
+  return `<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"><span class="pill">${esc(STR[lang].types[e.type])}</span>${groupLine(e)?`<span class="pill">${esc(groupLine(e))}</span>`:""}<span class="pill">${esc(bookLine(e))}</span>${e.hb&&e.hb.own?`<button class="btn sm" data-hbedit="${e.id}">${t("edit")}</button>`:""}</div>
+${e.hb?"":`   <div class="row" style="margin-bottom:12px"><span class="small muted">${t("showLang")}</span><div class="seg" role="group">
+     ${[["sv","SV"],["en","EN"],["both",t("both")]].map(([v,l])=>`<button data-dl="${v}" aria-pressed="${dl===v}">${l}</button>`).join("")}</div></div>`}
    <h3 style="font-size:1.3rem;margin-bottom:8px">${esc(title)}</h3>
    ${(e.sv.material||e.en.material)?`<p class="small"><b>${t("material")}:</b> ${esc(dl==="en"?e.en.material:e.sv.material)}</p>`:""}
    <div class="detail">${pick("desc")}${levels}${extra}</div>`;
@@ -875,6 +885,7 @@ function openDetail(id,ownedIdx){
     <div class="sheet-body" id="dbody">${detailHtml(e,owned)}</div>${foot()?`<div class="sheet-foot">${foot()}</div>`:""}`,{tall:true,stack:true});
   el.addEventListener("click",ev=>{
     const b=ev.target.closest("button,input"); if(!b) return;
+    if(b.dataset.hbedit){ closeTop(); hbEditor(null,BYID[b.dataset.hbedit]); return; }
     if(b.dataset.dl){ detailLang=b.dataset.dl; el.querySelector("#dbody").innerHTML=detailHtml(e,owned); return; }
     if(b.dataset.excattr){ selAttr=b.dataset.excattr; el.querySelectorAll("[data-excattr]").forEach(x=>x.setAttribute("aria-pressed",x===b));
       if(owned){ owned.attr=selAttr; touch(c); el.querySelector(".sheet-head h2").textContent=ownedName(e,owned); render(); } return; }
@@ -1025,9 +1036,15 @@ function eliteCheck(c,o){
     const allowed=sub&&!/^valfri/i.test(sub)?sub.split(/,| eller | och /).map(x=>x.trim()).filter(Boolean):null;
     if(name==="Mystisk kraft"||name==="Ritualist"){ const ty=name==="Ritualist"?"ritual":"power"; return owned.filter(y=>y.e.type===ty&&(!allowed||allowed.includes(y.e.sv.name))); }
     return owned.filter(y=>y.e.sv.name===name); };
-  const items=[]; let hits=[];
-  splitTop(o.sv.req||"",",").forEach(g=>{ const m=splitTop(g," eller ").flatMap(altMatch); hits=hits.concat(m); items.push({label:g,ok:m.length>0}); });
+  const items=[]; let hits=[]; const lvGroups=[];
+  const reqLevelled=g=>splitTop(g," eller ").some(a=>{ const name=(a.match(/^(.+?)\s*\(/)||[0,a])[1].trim();
+    if(name==="Mystisk kraft") return true; if(name==="Ritualist") return false;
+    const e=RULES.find(x=>x.sv.name===name&&ABIL_TYPES.includes(x.type)); return !!e&&hasLevels(e); });
+  splitTop(o.sv.req||"",",").forEach(g=>{ const m=splitTop(g," eller ").flatMap(altMatch); hits=hits.concat(m); items.push({label:g,ok:m.length>0});
+    if(reqLevelled(g)) lvGroups.push(Math.max(0,...m.filter(y=>hasLevels(y.e)).map(y=>y.x.level||1))); });
   items.push({label:t("eliteMaster"),ok:hits.some(y=>hasLevels(y.e)&&(y.x.level||1)>=3)});
+  if(SET.eliteAlt&&lvGroups.length>1){ const rest=[...lvGroups]; let mi=rest.findIndex(v=>v>=3); if(mi<0) mi=rest.indexOf(Math.max(...rest)); rest.splice(mi,1);
+    const need=Math.floor(rest.length/2)+1, have=rest.filter(v=>v>=2).length; items.push({label:t("eliteAltReq",{have,need}),ok:have>=need}); }
   const other=(o.sv.other||"").trim();
   if(other&&!/^inga$/i.test(other)){ const k=other.match(/korruption\s*(\d+)/i);
     if(k) items.push({label:other,ok:(+c.permCorr||0)<=+k[1]});
@@ -1087,9 +1104,120 @@ function listEdit(c,key,i,title,fields,blank){
     isNew?null:()=>confirmSheet(t("confirmDel",{x:v.name||t("note")}),()=>{ c[key].splice(i,1); touch(c); closeAll(); render(); }));
 }
 
+/* ---------- homebrew: settings, content and editor ---------- */
+const HB_TYPES=["ability","power","ritual","trait","monstrous","boon","burden"];
+/* toggles shown in the Homebrew view; add new ones here (g = which card they go in) */
+const HB_TOGGLES=[
+  {k:"eliteAlt",g:"rules",def:false,
+   sv:["Alternativt krav för elityrke","Utöver att en kravförmåga ska vara på mästarnivå måste majoriteten av de övriga kravförmågorna vara minst på gesällnivå."],
+   en:["Alternative elite requirement","Besides one required ability at master level, most of the other required abilities must be at least adept."]},
+  {k:"hbOfficial",g:"content",def:true,
+   sv:["Visa officiella homebrew-tillägg","Visar gruppens homebrew-innehåll som lagts in centralt."],
+   en:["Show official homebrew","Shows the group's homebrew content added centrally."]},
+  {k:"hbPublic",g:"content",def:false,
+   sv:["Visa publicerade homebrew-tillägg","Visar även homebrew som andra användare har markerat som publik."],
+   en:["Show published homebrew","Also shows homebrew other users have marked as public."]}];
+const SET={}; const setDefaults=()=>HB_TOGGLES.forEach(x=>SET[x.k]=x.def);
+setDefaults();
+let RULES=[], HBROWS=[];
+const hbStr=(v,max=8000)=>typeof v==="string"?v.slice(0,max):"";
+function hbEntry(row){ const d=row&&row.data||{}; if(!HB_TYPES.includes(d.type)||!/^hb-[a-z0-9]+$/.test(row.id||"")) return null; const s=d.sv||{};
+  const levels=d.type==="ability"||d.type==="power"?true:d.type==="ritual"?false:!!d.levels;
+  const sv={name:hbStr(s.name,120).trim()||"—",desc:hbStr(s.desc),material:hbStr(s.material,500),novice:"",adept:"",master:""};
+  if(levels){ sv.novice=hbStr(s.novice)||"—"; sv.adept=hbStr(s.adept); sv.master=hbStr(s.master); }
+  const arr=(a,ok)=>Array.isArray(a)?a.filter(x=>ok.includes(x)):[];
+  return {id:row.id,type:d.type,book:"HB",ref:"",traditions:(d.type==="power"||d.type==="ritual")?arr(d.traditions,TRADS):[],archetypes:d.type==="ability"?arr(d.archetypes,ARCHES):[],
+    specialization:null,race:null,onlyArchetype:false,sv,en:sv,
+    hb:{own:!!S.user&&row.user_id===S.user.id,pub:!!row.is_public,official:!!row.official,levels,ranks:d.type==="boon"&&!levels&&!!d.ranks,raw:d}}; }
+const hbVisible=e=>e.hb.own||(e.hb.official&&SET.hbOfficial)||(e.hb.pub&&SET.hbPublic);
+function rebuildData(){ const hb=HBROWS.map(hbEntry).filter(Boolean);
+  DATA=RULES.concat(hb.filter(hbVisible)); BYID={}; QIDX=null; NIDX=null;
+  RULES.forEach(e=>BYID[e.id]=e); hb.forEach(e=>BYID[e.id]=e); }
+const safeRender=()=>{ if(S.user&&!document.querySelector("#layer .scrim")&&!isTyping()) render(); };
+/* settings follow the account (user_settings), with a local copy for offline */
+const setKey=()=>"sym.set."+(S.user?S.user.id:"");
+function applySettings(o){ setDefaults(); if(o&&typeof o==="object") HB_TOGGLES.forEach(x=>{ if(typeof o[x.k]==="boolean") SET[x.k]=o[x.k]; }); }
+function loadSettingsLocal(){ try{ applySettings(JSON.parse(localStorage.getItem(setKey())||"null")); }catch(e){ applySettings(null); } }
+async function refreshSettings(){ try{ const r=await sb.from("user_settings").select("data"); if(r.error||!r.data) return;
+    if(!r.data.length) return; const before=JSON.stringify(SET); applySettings(r.data[0].data);
+    try{ localStorage.setItem(setKey(),JSON.stringify(SET)); }catch(e){}
+    if(JSON.stringify(SET)!==before){ rebuildData(); safeRender(); } }catch(e){} }
+async function setSetting(k,v){ SET[k]=v; try{ localStorage.setItem(setKey(),JSON.stringify(SET)); }catch(e){} rebuildData();
+  try{ const r=await sb.from("user_settings").upsert({user_id:S.user.id,data:{...SET},updated_at:new Date().toISOString()},{onConflict:"user_id"}); if(r.error) throw r.error; }
+  catch(e){ toast(t("hbSetOffline")); } }
+/* homebrew rows: cached in IndexedDB per user, refreshed on start and after every change */
+async function loadHBCache(){ try{ const c=await IDB.get("hb."+S.user.id); if(Array.isArray(c)) HBROWS=c; }catch(e){} }
+async function refreshHB(){ const r=await sb.from("homebrew").select("id,user_id,is_public,official,data,updated_at").order("id"); if(r.error) throw r.error;
+  const before=JSON.stringify(HBROWS); HBROWS=r.data||[]; if(JSON.stringify(HBROWS)===before) return false;
+  try{ await IDB.set("hb."+S.user.id,HBROWS); }catch(e){} rebuildData(); return true; }
+function hbTag(e){ return t(e.hb.official?"hbOfficialTag":e.hb.own?"hbOwnTag":"hbPublicTag"); }
+const HB_KINDS=["ability","mystic","trait","boon","burden"];
+const kindOf=ty=>ty==="power"||ty==="ritual"?"mystic":ty==="monstrous"?"trait":ty;
+function viewHomebrew(){
+  setTitle(t("hbTitle"),true);
+  const tog=x=>`<label class="tog"><span class="tx"><b>${esc(x[lang][0])}</b><span class="small muted">${esc(x[lang][1])}</span></span><input type="checkbox" class="switch" data-hbset="${x.k}" ${SET[x.k]?"checked":""}></label>`;
+  const mine=HBROWS.map(hbEntry).filter(e=>e&&e.hb.own).sort((a,b)=>a.sv.name.localeCompare(b.sv.name,"sv"));
+  const off=HBROWS.map(hbEntry).filter(e=>e&&e.hb.official).length;
+  return `<div class="stack">
+  <div class="card stack"><h3>${t("hbRules")}</h3>${HB_TOGGLES.filter(x=>x.g==="rules").map(tog).join("")}</div>
+  <div class="card stack"><h3>${t("hbContent")}</h3>${HB_TOGGLES.filter(x=>x.g==="content").map(tog).join("")}${off?`<p class="small muted" style="margin:0">${t("hbOffCount",{n:off})}</p>`:""}</div>
+  <div class="card stack"><h3>${t("hbCreate")}</h3><div class="hbcreate">${HB_KINDS.map(k=>`<button class="btn" data-act="hbNew" data-k="${k}">+ ${t("hbK_"+k)}</button>`).join("")}</div></div>
+  <div class="card stack"><h3>${t("hbMine")}</h3>${mine.length?`<div class="results">${mine.map(e=>`<button class="res" data-act="hbEdit" data-id="${e.id}"><div><div class="nm">${esc(e.sv.name)}</div><div class="sub">${esc(STR[lang].types[e.type])}${e.traditions.length?" · "+esc(e.traditions.map(tr).join(", ")):""}</div></div>${e.hb.pub?`<span class="right pill">${t("hbPublicTag")}</span>`:""}</button>`).join("")}</div>`:`<p class="small muted" style="margin:0">${t("hbNone")}</p>`}</div>
+  </div>`;
+}
+function hbNewId(){ const a=new Uint8Array(12); crypto.getRandomValues(a); return "hb-"+[...a].map(x=>(x%36).toString(36)).join(""); }
+function hbEditor(kind,e){
+  const isNew=!e; const d=e?e.hb.raw:{}; const s=e?e.sv:{name:"",desc:"",material:"",novice:"",adept:"",master:""};
+  kind=e?kindOf(e.type):kind;
+  let type=e?e.type:{ability:"ability",mystic:"power",trait:"trait",boon:"boon",burden:"burden"}[kind];
+  const multi=(id,list,sel,lab)=>`<div class="f" id="${id}_w"><span>${esc(lab)}</span><div class="chips wrap" id="${id}">${list.map(x=>`<button type="button" data-v="${esc(x)}" aria-pressed="${sel.includes(x)}">${esc(id==="hb_tr"?tr(x):ar(x))}</button>`).join("")}</div></div>`;
+  const seg=kind==="mystic"?[["power","power"],["ritual","ritual"]]:kind==="trait"?[["trait","trait"],["monstrous","monstrous"]]:null;
+  const area=(k,l,v)=>`<label class="f" id="hb_${k}_w" for="hb_${k}">${esc(l)}<textarea class="t" id="hb_${k}" rows="3">${esc(v||"")}</textarea></label>`;
+  const body=`<form class="sheet-body stack" id="hbf">
+    <label class="f" for="hb_name">${t("name")}<input class="t" id="hb_name" maxlength="120" value="${esc(s.name==="—"?"":s.name)}"></label>
+    ${seg?`<div class="f"><span>${t("hbTypeT")}</span><div class="seg" role="group" id="hb_type">${seg.map(([v])=>`<button type="button" data-v="${v}" aria-pressed="${type===v}">${esc(STR[lang].types[v])}</button>`).join("")}</div></div>`:""}
+    ${kind==="mystic"?multi("hb_tr",TRADS,e?e.traditions:[],t("tradition")):""}
+    ${kind==="ability"?multi("hb_ar",ARCHES,e?e.archetypes:[],t("arche")):""}
+    ${area("desc",t("hbDesc"),s.desc)}
+    ${kind==="mystic"?`<label class="f" for="hb_material">${t("material")}<input class="t" id="hb_material" maxlength="500" value="${esc(s.material||"")}"></label>`:""}
+    ${["trait","boon","burden"].includes(kind)?`<label class="row small"><input type="checkbox" id="hb_levels" ${d.levels?"checked":""}> ${t("hbLevels")}</label>`:""}
+    ${kind==="boon"?`<label class="row small" id="hb_ranks_w"><input type="checkbox" id="hb_ranks" ${d.ranks?"checked":""}> ${t("hbRanks")}</label>`:""}
+    ${area("novice",t("novice"),s.novice==="—"?"":s.novice)}${area("adept",t("adept"),s.adept)}${area("master",t("master"),s.master)}
+    <label class="row small"><input type="checkbox" id="hb_pub" ${e&&e.hb.pub?"checked":""}> ${t("hbPublic")}</label>
+    <p class="small muted" style="margin:-6px 0 0">${t("hbPublicHint")}</p>
+  </form>`;
+  const el=sheet(`<div class="sheet-head"><h2>${esc(isNew?t("hbNewT",{x:t("hbK_"+kind)}):t("hbEditT"))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>${body}
+    <div class="sheet-foot">${isNew?"":`<button class="btn danger" id="hbdel" style="margin-right:auto">${t("del")}</button>`}<button class="btn" data-close>${t("cancel")}</button><button class="btn primary" id="hbsave">${t("save")}</button></div>`,{tall:true,focus:isNew,stack:true});
+  const $$=q=>el.querySelector(q);
+  const levelsOn=()=>type==="ability"||type==="power"?true:type==="ritual"?false:!!($$("#hb_levels")&&$$("#hb_levels").checked);
+  const sync=()=>{ const lv=levelsOn(); ["novice","adept","master"].forEach(k=>$$(`#hb_${k}_w`).hidden=!lv);
+    if($$("#hb_ranks_w")) $$("#hb_ranks_w").hidden=lv; };
+  el.addEventListener("click",ev=>{ const b=ev.target.closest("button[data-v]"); if(!b) return;
+    if(b.parentElement.id==="hb_type"){ type=b.dataset.v; b.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); sync(); return; }
+    b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true"); });
+  el.addEventListener("change",ev=>{ if(ev.target.id==="hb_levels") sync(); }); sync();
+  let busy=false;
+  const save=async()=>{ if(busy) return; const name=$$("#hb_name").value.trim(); if(!name){ toast(t("hbNeedName")); $$("#hb_name").focus(); return; }
+    const lv=levelsOn(); const val=k=>($$("#hb_"+k)?$$("#hb_"+k).value.trim():"");
+    if(lv&&!val("novice")){ toast(t("hbNeedNovice")); $$("#hb_novice").focus(); return; }
+    const sel=id=>$$("#"+id)?[...$$("#"+id).querySelectorAll('[aria-pressed="true"]')].map(x=>x.dataset.v):[];
+    const data={type,sv:{name,desc:val("desc"),material:val("material"),novice:lv?val("novice"):"",adept:lv?val("adept"):"",master:lv?val("master"):""},
+      traditions:sel("hb_tr"),archetypes:sel("hb_ar"),levels:lv,ranks:type==="boon"&&!lv&&!!($$("#hb_ranks")&&$$("#hb_ranks").checked)};
+    const pub=$$("#hb_pub").checked, now=new Date().toISOString();
+    busy=true; $$("#hbsave").disabled=true;
+    try{ const r=isNew?await sb.from("homebrew").insert({id:hbNewId(),data,is_public:pub,updated_at:now})
+                      :await sb.from("homebrew").update({data,is_public:pub,updated_at:now}).eq("id",e.id);
+      if(r.error) throw r.error; await refreshHB().catch(()=>{}); closeTop(); toast(t("hbSaved",{x:name})); render(); }
+    catch(err){ toast(t("hbSaveErr")); busy=false; $$("#hbsave").disabled=false; } };
+  $$("#hbsave").onclick=save; $$("#hbf").addEventListener("submit",ev=>{ ev.preventDefault(); save(); });
+  if(!isNew) $$("#hbdel").onclick=()=>confirmSheet(t("hbConfirmDel",{x:s.name}),async()=>{
+    const r=await sb.from("homebrew").delete().eq("id",e.id); if(r.error){ toast(t("hbSaveErr")); return; }
+    await refreshHB().catch(()=>{}); closeAll(); toast(t("hbDeleted",{x:s.name})); render(); });
+}
+
 /* ---------- events ---------- */
 document.getElementById("tabs").addEventListener("click",ev=>{ const b=ev.target.closest("[data-nav]"); if(!b) return; S.view=b.dataset.nav; if(S.view==="lib") Object.assign(P,{q:"",type:"all",group:"all",book:"all",sort:P.tab==="items"?"group":"name",sec:null}); closeAll(); render(); $("#main").scrollTop=0; });
-$("#backBtn").onclick=()=>{ S.view="chars"; render(); };
+$("#backBtn").onclick=()=>{ S.view=S.view==="homebrew"?"settings":"chars"; render(); };
 const setLang=l=>{ lang=l; try{localStorage.setItem("sym.lang",l);}catch(e){} closeAll(); if(S.user) render(); else showLogin(); };
 $("#langSv").onclick=()=>setLang("sv"); $("#langEn").onclick=()=>setLang("en");
 $("#main").addEventListener("click",ev=>{
@@ -1117,6 +1245,9 @@ $("#main").addEventListener("click",ev=>{
   else if(act==="arch") openArch(b.dataset.id);
   else if(act==="editN"){ const i=+b.dataset.i; listEdit(c,"notes",i,t(i<0?"newNote":"note"),[["text",t("note"),"area"]],{text:"",date:Date.now()}); }
   else if(act==="lang") setLang(b.dataset.l);
+  else if(act==="hbOpen"){ S.view="homebrew"; render(); refreshHB().then(ch=>{ if(ch) safeRender(); }).catch(()=>{}); }
+  else if(act==="hbNew") hbEditor(b.dataset.k,null);
+  else if(act==="hbEdit"){ const e=hbEntry(HBROWS.find(r=>r.id===b.dataset.id)); if(e) hbEditor(null,e); }
   else if(act==="export") doExport();
   else if(act==="copyAll") copyAll(b);
   else if(act==="import") $("#fileIn").click();
@@ -1128,7 +1259,7 @@ function getField(c,f){ const [a,b]=f.split("."); return b?c[a][b]:c[a]; }
 function setField(c,f,v){ const [a,b]=f.split("."); if(f==="damage"||f.startsWith("money")||f==="tempCorr"||f==="permCorr") v=Math.max(0,v); if(f.startsWith("attrs")) v=Math.max(0,Math.min(25,v));
   if(b) c[a][b]=v; else c[a]=v; touch(c); }
 $("#main").addEventListener("input",ev=>{ const ls=ev.target.dataset.libsearch; if(ls){ if(ls==="jobs") P.jq=ev.target.value; else P.rq=ev.target.value; const box=$("#libres"); if(box) box.innerHTML=ls==="jobs"?jobsList():racesList(); return; } const f=ev.target.dataset.in; if(!f) return; const c=cur(); const n=parseInt(ev.target.value); if(isNaN(n)) return; setField(c,f,n); updateDerived(c); });
-$("#main").addEventListener("change",ev=>{ const f=ev.target.dataset.in; if(!f) return; ev.target.value=getField(cur(),f); });
+$("#main").addEventListener("change",ev=>{ if(ev.target.dataset.hbset){ setSetting(ev.target.dataset.hbset,ev.target.checked); return; } const f=ev.target.dataset.in; if(!f) return; ev.target.value=getField(cur(),f); });
 function updateDerived(c){
   const d=derived(c); const set=(k,v)=>{ const el=document.querySelector(`[data-d="${k}"]`); if(el) el.textContent=v; };
   set("hp",`${d.tough-(c.damage||0)} / ${d.tough}`); set("toughness",d.tough); set("pain",d.pain); set("defense",d.def); set("corrThr",d.corrThr); set("abomThr",d.abom);
@@ -1175,10 +1306,12 @@ async function startSession(user){
   if(S.user&&S.user.id===user.id) return;
   S.user=user; document.getElementById("tabs").hidden=false; dirty.clear(); loadDirty(); loadLocal();
   $("#main").innerHTML=`<p class="muted">${t("loading")}</p>`;
+  loadSettingsLocal(); await loadHBCache();
   try{ await loadRules(); }catch(e){ $("#main").innerHTML=`<div class="empty">${t("rulesErr")}<br><span class="small">${esc((e&&(e.message||e.code))||String(e))}</span><br><br><button class="btn" onclick="location.reload()">${lang==="en"?"Reload":"Ladda om"}</button></div>`; return; }
-  S.view="chars"; render(); pull();
+  rebuildData(); S.view="chars"; render(); pull();
+  refreshSettings(); refreshHB().then(ch=>{ if(ch) safeRender(); }).catch(()=>{});
 }
-async function signOut(){ await sb.auth.signOut(); S.user=null; S.chars=[]; closeAll(); showLogin(); }
+async function signOut(){ await sb.auth.signOut(); S.user=null; S.chars=[]; HBROWS=[]; setDefaults(); closeAll(); showLogin(); }
 function changePw(){
   formSheet(t("changePw"),[["pw",t("newPw"),"text"]],{pw:""},async o=>{
     if((o.pw||"").length<8){ toast(t("pwShort")); return; }
