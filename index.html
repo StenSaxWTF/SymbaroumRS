@@ -92,6 +92,12 @@ nav.tabs button[aria-current="page"] svg{color:var(--accent)}
 @media (min-width:560px){.attrs{grid-template-columns:repeat(4,1fr)}}
 .attr{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
 .attr .name{font-size:.88rem;color:var(--muted)}
+.excgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.excgrid button{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 4px;font-size:.85rem;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.excgrid button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.excgrid button[disabled]{opacity:.35;text-decoration:line-through}
+.attr .xbon{vertical-align:baseline}
+.xbon{font-size:.7rem;font-weight:600;color:var(--good);margin-left:3px;vertical-align:super}
 .attrgrid,.dergrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .dergrid{grid-template-columns:repeat(5,1fr)}
 @media (max-width:560px){.dergrid{grid-template-columns:repeat(3,1fr)}.dergrid>.dv:last-child{grid-column:span 2}}
@@ -265,7 +271,7 @@ navChars:"Rollpersoner",navLib:"Bibliotek",libAbil:"Förmågor",libItems:"Utrust
 newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",noHits:"Inga träffar.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",pickOrType:"Välj nedan eller skriv eget",eliteGoal:"Elityrke",eliteAsp:"Aspirerande {x}",elitePickT:"Välj elityrke att sträva mot",eliteClear:"Ta bort mål",eliteShow:"Visa elityrket",eliteChange:"Byt",eliteInit:"Markera som invigd",eliteUndo:"Ångra invigning",eliteNeedAll:"När alla krav är uppfyllda behövs ett rollspelat inval – markera sedan rollpersonen som invigd.",eliteDoneT:"Invigd {x}",eliteMaster:"Minst en av kravförmågorna på mästarnivå",eliteManual:"kontrollera själv",eliteOther:"Övrigt",eliteReqs:"Krav",eliteDoneMsg:"{x} är nu invigd!",eliteGeneral:"Övriga",color:"Färg",
 save:"Spara",cancel:"Avbryt",del:"Radera",edit:"Redigera",add:"Lägg till",close:"Stäng",confirmDel:"Radera {x}? Det går inte att ångra.",
 tOverview:"Översikt",tAbilities:"Förmågor",tCombat:"Strid",tGear:"Utrustning",tNotes:"Anteckningar",
-attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",
+attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",excPick:"Vilket karaktärsdrag?",excAllTaken:"Alla karaktärsdrag har redan förmågan.",excName:"Exceptionellt karaktärsdrag",excEditHint:"Här ändrar du grundvärdena (summa 80). +n kommer från Exceptionellt karaktärsdrag och läggs på automatiskt.",
 accurate:"Träffsäker",cunning:"Listig",discreet:"Diskret",persuasive:"Övertygande",quick:"Kvick",resolute:"Viljestark",strong:"Stark",vigilant:"Vaksam",
 toughness:"Tålighet",pain:"Smärtgräns",defense:"Försvar",corrThr:"Korruptionströskel",abomThr:"Styggelsetröskel",
 current:"Nu",damage:"Skada",tempCorr:"Temporär korruption",permCorr:"Permanent korruption",totalCorr:"Total korruption",
@@ -300,7 +306,7 @@ navChars:"Characters",navLib:"Library",libAbil:"Abilities",libItems:"Equipment",
 newChar:"New character",noChars:"No characters yet. Create your first one.",noHits:"No matches.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",pickOrType:"Pick below or type your own",eliteGoal:"Elite occupation",eliteAsp:"Aspiring {x}",elitePickT:"Choose an elite occupation to strive for",eliteClear:"Remove goal",eliteShow:"Show the elite occupation",eliteChange:"Change",eliteInit:"Mark as initiated",eliteUndo:"Undo initiation",eliteNeedAll:"When every requirement is met, a roleplayed initiation is needed – then mark the character as initiated.",eliteDoneT:"Initiated {x}",eliteMaster:"At least one required ability at master level",eliteManual:"check yourself",eliteOther:"Other",eliteReqs:"Requirements",eliteDoneMsg:"{x} is now initiated!",eliteGeneral:"Other",color:"Colour",
 save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",add:"Add",close:"Close",confirmDel:"Delete {x}? This cannot be undone.",
 tOverview:"Overview",tAbilities:"Abilities",tCombat:"Combat",tGear:"Gear",tNotes:"Notes",
-attributes:"Attributes",attrSum:"Total {n} of 80",
+attributes:"Attributes",attrSum:"Total {n} of 80",excPick:"Which attribute?",excAllTaken:"Every attribute already has this ability.",excName:"Exceptional Attribute",excEditHint:"These are the base values (total 80). +n comes from Exceptional Attribute and is added automatically.",
 accurate:"Accurate",cunning:"Cunning",discreet:"Discreet",persuasive:"Persuasive",quick:"Quick",resolute:"Resolute",strong:"Strong",vigilant:"Vigilant",
 toughness:"Toughness",pain:"Pain Threshold",defense:"Defense",corrThr:"Corruption Threshold",abomThr:"Abomination Threshold",
 current:"Now",damage:"Damage",tempCorr:"Temporary corruption",permCorr:"Permanent corruption",totalCorr:"Total corruption",
@@ -334,6 +340,11 @@ const RACE_EN={"resar":"ogres","svartalf":"dark elves","bortbyting":"changelings
 const TRADS=["Ordensmagi","Häxkonster","Svartkonst","Teurgi","Symbolism","Stavmagi","Trollsång"];
 const ARCHES=["Krigare","Mystiker","Tjuv","Jägare"];
 const ATTRS=["accurate","cunning","discreet","persuasive","quick","resolute","strong","vigilant"];
+/* Exceptionellt karaktärsdrag: can be taken once per attribute; o.attr = which one, +level to that attribute */
+const isExc=e=>!!e&&e.type==="ability"&&(e.sv.name==="Exceptionellt karaktärsdrag"||(e.en&&e.en.name==="Exceptional Attribute"));
+function attrBonus(c){ const b={}; (c.abilities||[]).forEach(o=>{ if(o.attr&&isExc(BYID[o.ref])) b[o.attr]=(b[o.attr]||0)+(o.level||1); }); return b; }
+function effAttrs(c){ const b=attrBonus(c), a={}; ATTRS.forEach(k=>a[k]=(+c.attrs[k]||0)+(b[k]||0)); return a; }
+const ownedName=(e,o)=>nameOf(e)+(o&&o.attr&&isExc(e)?` (${t(o.attr)})`:"");
 const COLORS=["#c0614a","#d0a14a","#8fa776","#5f9e9a","#6f86c4","#9a6fb0","#c4708f","#a59a85"];
 const SECTIONS={abilities:["ability","tradition"],mystic:["power","ritual"],traits:["trait","monstrous","boon","burden"],weapons:["weapon"],armors:["armor"],gear:["gear","property"]};
 const ITEM_SECS={weapons:"weapons",armors:"armors",gear:"gear"};
@@ -492,7 +503,7 @@ function statusHtml(){ const s=S.syncState; return `<span class="dot ${s==="sync
 
 /* ---------- derived values ---------- */
 function derived(c){
-  const a=c.attrs, m=c.mods; const worn=c.armors.filter(x=>x.worn);
+  const a=effAttrs(c), m=c.mods; const worn=c.armors.filter(x=>x.worn);
   const imp=worn.reduce((s,x)=>s+(parseInt(String(x.impede).replace("−","-"))||0),0);
   const bal=c.weapons.filter(w=>w.inUse&&hasQual(w.quality,"Balanserat")).length;
   const tough=Math.max(a.strong,10)+(m.toughness||0);
@@ -501,7 +512,7 @@ function derived(c){
   const spent=c.abilities.reduce((s,o)=>{const e=BYID[o.ref]; return s+(e?costOf(e,o):0);},0);
   return {tough, pain:Math.ceil(a.strong/2)+(m.pain||0), def:a.quick+imp+bal+(m.defense||0), imp, bal,
     corrThr:(strongGift?a.resolute:Math.ceil(a.resolute/2))+(m.corrThr||0), abom:strongGift?a.resolute*2:a.resolute, strongGift, spent, left:(c.xpTotal||0)-spent,
-    sum:ATTRS.reduce((s,k)=>s+(+a[k]||0),0), totalCorr:(c.permCorr||0)+(c.tempCorr||0)};
+    sum:ATTRS.reduce((s,k)=>s+(+c.attrs[k]||0),0), totalCorr:(c.permCorr||0)+(c.tempCorr||0)};
 }
 
 /* ---------- rendering ---------- */
@@ -554,7 +565,7 @@ function stepper(field,val,extra=""){ return `<span class="stepper"><button data
 function subOverview(c){
   const d=derived(c); const hp=d.tough-(c.damage||0); const pct=Math.max(0,Math.min(100,hp/d.tough*100));
   const cp=Math.min(100,d.totalCorr/Math.max(1,d.abom)*100);
-  const sumCls=d.sum===80?"ok":"warn";
+  const sumCls=d.sum===80?"ok":"warn"; const ab=attrBonus(c);
   const ed=!!S.editStats;
   const tile=(k,v,f,mod)=> ed?`<div class="tile"><div class="k">${t(k)}</div><div class="v" data-d="${k}">${v}</div><div class="f">${f}</div>
      <label class="f small" style="margin-top:6px">${t("modifier")}${stepper("mods."+mod,c.mods[mod]||0)}</label></div>`
@@ -571,8 +582,8 @@ function subOverview(c){
   </div>
   <div class="card stack"><div class="sec-head"><h3>${t("attributes")}</h3>${(ed||d.sum!==80)?`<span class="pill ${sumCls}" data-d="sum">${t("attrSum",{n:d.sum})}</span>`:""}
       <button class="btn sm ${ed?"primary":""}" data-act="toggleEdit">${ed?t("done"):t("editStats")}</button></div>
-    ${ed?`<div class="attrs">${ATTRS.map(k=>`<div class="attr"><span class="name">${t(k)}</span>${stepper("attrs."+k,c.attrs[k])}</div>`).join("")}</div>`
-       :`<div class="attrgrid">${ATTRS.map(k=>`<div class="av"><span class="name">${t(k)}</span><span class="num">${c.attrs[k]}</span></div>`).join("")}</div>`}
+    ${ed?`<div class="attrs">${ATTRS.map(k=>`<div class="attr"><span class="name">${t(k)}${ab[k]?` <span class="xbon" title="${esc(t("excName"))}">+${ab[k]}</span>`:""}</span>${stepper("attrs."+k,c.attrs[k])}</div>`).join("")}</div>${Object.keys(ab).length?`<p class="small muted" style="margin:0">${t("excEditHint")}</p>`:""}`
+       :`<div class="attrgrid">${ATTRS.map(k=>`<div class="av"><span class="name">${t(k)}</span><span class="num">${(+c.attrs[k]||0)+(ab[k]||0)}${ab[k]?`<span class="xbon" title="${esc(t("excName"))}">+${ab[k]}</span>`:""}</span></div>`).join("")}</div>`}
     <div class="sub-h">${t("derived")}</div>
     <div class="${ed?"tiles":"dergrid"}">
     ${tile("toughness",d.tough,`max(${t("strong")}, 10)`,"toughness")}
@@ -594,7 +605,7 @@ function ownedList(c,types){
     .sort((a,b)=>nameOf(a.e).localeCompare(nameOf(b.e),lang));
   if(!rows.length) return `<div class="empty small">${t("none")}</div>`;
   return `<div class="owned">${rows.map(({o,i,e})=>`<button class="item" data-act="ownedDetail" data-i="${i}">
-     <div><div class="nm">${esc(nameOf(e))}</div><div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""}</div></div>
+     <div><div class="nm">${esc(ownedName(e,o))}</div><div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""}</div></div>
      <div class="right">${hasLevels(e)?`<span class="pill lv">${t(["","novice","adept","master"][o.level||1])}</span>`:""}${maxRanks(e)>1?`<span class="pill lv">×${o.ranks||1}</span>`:""}<span class="pill num">${o.free?"0":costOf(e,o)} XP</span></div></button>`).join("")}</div>`;
 }
 function subAbilities(c){
@@ -842,24 +853,32 @@ function detailHtml(e,owned){
 function openDetail(id,ownedIdx){
   const e=BYID[id]; if(!e) return; detailLang=null;
   const c=S.view==="char"?cur():null;
-  const ownedI=ownedIdx!=null?ownedIdx:(c?c.abilities.findIndex(o=>o.ref===id):-1);
+  const exc=isExc(e);
+  const ownedI=ownedIdx!=null?ownedIdx:(c&&!exc?c.abilities.findIndex(o=>o.ref===id):-1);
   const owned=ownedI>=0?c.abilities[ownedI]:null;
   const inAdd=!!document.querySelector("#layer .pickwrap");
+  const takenAttrs=()=>c?c.abilities.filter((o,i)=>i!==ownedI&&o.ref===e.id&&o.attr).map(o=>o.attr):[];
+  let selAttr=exc&&c?(owned?owned.attr||null:ATTRS.find(k=>!takenAttrs().includes(k))||null):null;
+  const attrSeg=()=>`<div class="stack" style="gap:6px;width:100%"><span class="small muted">${t("excPick")}</span><div class="excgrid">${ATTRS.map(k=>{ const tk=takenAttrs().includes(k); return `<button class="chip" data-excattr="${k}" aria-pressed="${selAttr===k}" ${tk?"disabled":""}>${t(k)}</button>`; }).join("")}</div></div>`;
   const foot=()=>{
     if(!c) return "";
+    if(exc&&!owned&&!selAttr) return `<span class="small muted">${t("excAllTaken")}</span>`;
+    if(exc&&!owned) return attrSeg()+[1,2,3].map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="${n}">+ ${t(["","novice","adept","master"][n])} <span class="small">(${[0,10,30,60][n]})</span></button>`).join("");
     if(owned){ const lvBtns=maxRanks(e)>1?`<div class="row" style="gap:6px;margin-right:auto"><span class="small muted">${t("ranks")}</span><div class="seg" role="group">${[1,2,3].slice(0,maxRanks(e)).map(n=>`<button data-setrank="${n}" aria-pressed="${(owned.ranks||1)===n}">${n} <span class="small">(+${n})</span></button>`).join("")}</div></div>`:hasLevels(e)?`<div class="seg" role="group" style="margin-right:auto">${[1,2,3].map(n=>`<button data-setlv="${n}" aria-pressed="${(owned.level||1)===n}">${t(["","novice","adept","master"][n])}</button>`).join("")}</div>`:"";
-      return `${lvBtns}<label class="row small muted" style="gap:6px"><input type="checkbox" id="freeChk" ${owned.free?"checked":""}> ${t("free")}</label>
+      return `${exc?attrSeg():""}${lvBtns}<label class="row small muted" style="gap:6px"><input type="checkbox" id="freeChk" ${owned.free?"checked":""}> ${t("free")}</label>
         <button class="btn danger sm" data-remove>${t("remove")}</button>`; }
     if(hasLevels(e)) return [1,2,3].map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="${n}">+ ${t(["","novice","adept","master"][n])} <span class="small">(${[0,10,30,60][n]})</span></button>`).join("");
     if(maxRanks(e)>1) return [1,2,3].slice(0,maxRanks(e)).map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="0" data-rank="${n}">+ ${n}× <span class="small">(${5*n} XP)</span></button>`).join("");
     return `<button class="btn primary" data-addlv="0">+ ${t("add")} <span class="small">(${costOf(e,{})} XP)</span></button>`;
   };
-  const el=sheet(`<div class="sheet-head"><h2>${esc(nameOf(e))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
+  const el=sheet(`<div class="sheet-head"><h2>${esc(owned?ownedName(e,owned):nameOf(e))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
     <div class="sheet-body" id="dbody">${detailHtml(e,owned)}</div>${foot()?`<div class="sheet-foot">${foot()}</div>`:""}`,{tall:true,stack:true});
   el.addEventListener("click",ev=>{
     const b=ev.target.closest("button,input"); if(!b) return;
     if(b.dataset.dl){ detailLang=b.dataset.dl; el.querySelector("#dbody").innerHTML=detailHtml(e,owned); return; }
-    if(b.dataset.addlv!==undefined){ const o={ref:e.id,level:+b.dataset.addlv||1}; if(b.dataset.rank) o.ranks=+b.dataset.rank; c.abilities.push(o); touch(c); closeTop(); toast(t("added",{x:nameOf(e)}));
+    if(b.dataset.excattr){ selAttr=b.dataset.excattr; el.querySelectorAll("[data-excattr]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+      if(owned){ owned.attr=selAttr; touch(c); el.querySelector(".sheet-head h2").textContent=ownedName(e,owned); render(); } return; }
+    if(b.dataset.addlv!==undefined){ const o={ref:e.id,level:+b.dataset.addlv||1}; if(b.dataset.rank) o.ranks=+b.dataset.rank; if(exc) o.attr=selAttr; c.abilities.push(o); touch(c); closeTop(); toast(t("added",{x:ownedName(e,o)}));
       const pw=document.querySelector("#layer .pickwrap"); if(pw) renderResults(pw.closest(".sheet"),P.sec); render();
       if(document.querySelector("#layer [data-eliteinfo]")){ closeAll(); eliteInfo(c); } return; }
     if(b.dataset.setlv){ owned.level=+b.dataset.setlv; touch(c); el.querySelectorAll("[data-setlv]").forEach(x=>x.setAttribute("aria-pressed",x===b)); el.querySelector("#dbody").innerHTML=detailHtml(e,owned); render(); return; }
