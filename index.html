@@ -92,6 +92,7 @@ nav.tabs button[aria-current="page"] svg{color:var(--accent)}
 @media (min-width:560px){.attrs{grid-template-columns:repeat(4,1fr)}}
 .attr{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
 .attr .name{font-size:.88rem;color:var(--muted)}
+.hbico{width:1.05em;height:1.05em;vertical-align:-.17em;margin-left:6px;color:#e8892c;flex:none;display:inline-block}
 .tog{display:flex;align-items:center;gap:14px;justify-content:space-between}
 .tog .tx{display:flex;flex-direction:column;gap:2px}
 input.switch{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);position:relative;cursor:pointer;transition:background .15s}
@@ -278,7 +279,7 @@ navChars:"Rollpersoner",navLib:"Bibliotek",libAbil:"Förmågor",libItems:"Utrust
 newChar:"Ny rollperson",noChars:"Inga rollpersoner än. Skapa din första.",noHits:"Inga träffar.",name:"Namn",race:"Släkte",archetype:"Arketyp",occupation:"Yrke",pickOrType:"Välj nedan eller skriv eget",eliteGoal:"Elityrke",eliteAsp:"Aspirerande {x}",elitePickT:"Välj elityrke att sträva mot",eliteClear:"Ta bort mål",eliteShow:"Visa elityrket",eliteChange:"Byt",eliteInit:"Markera som invigd",eliteUndo:"Ångra invigning",eliteNeedAll:"När alla krav är uppfyllda behövs ett rollspelat inval – markera sedan rollpersonen som invigd.",eliteDoneT:"Invigd {x}",eliteMaster:"Minst en av kravförmågorna på mästarnivå",eliteManual:"kontrollera själv",eliteOther:"Övrigt",eliteReqs:"Krav",eliteDoneMsg:"{x} är nu invigd!",eliteGeneral:"Övriga",color:"Färg",
 save:"Spara",cancel:"Avbryt",del:"Radera",edit:"Redigera",add:"Lägg till",close:"Stäng",confirmDel:"Radera {x}? Det går inte att ångra.",
 tOverview:"Översikt",tAbilities:"Förmågor",tCombat:"Strid",tGear:"Utrustning",tNotes:"Anteckningar",
-hbTitle:"Homebrew",hbIntro:"Husregler och egna förmågor, krafter, särdrag, fördelar och nackdelar.",hbOpen:"Öppna homebrew",hbRules:"Regelvarianter",hbContent:"Homebrew-innehåll",hbCreate:"Skapa homebrew",hbMine:"Mina homebrew",hbNone:"Du har inte skapat något ännu.",hbK_ability:"Förmåga",hbK_mystic:"Kraft / ritual",hbK_trait:"Särdrag",hbK_boon:"Fördel",hbK_burden:"Nackdel",hbNewT:"Ny homebrew: {x}",hbEditT:"Redigera homebrew",hbDesc:"Beskrivning",hbLevels:"Har nivåer (Novis, Gesäll, Mästare)",hbRanks:"Kan tas flera gånger (upp till 3)",hbPublic:"Publik",hbPublicHint:"Publik homebrew syns för andra användare som har slagit på Visa publicerade homebrew-tillägg.",hbNeedName:"Ge den ett namn.",hbNeedNovice:"Fyll i texten för Novis.",hbSaved:"{x} sparad",hbDeleted:"{x} borttagen",hbSaveErr:"Det gick inte att spara. Är du uppkopplad?",hbSetOffline:"Inställningen sparades bara på den här enheten (ingen uppkoppling).",hbConfirmDel:"Ta bort {x}? Rollpersoner som har den tappar den.",hbOwnTag:"Egen",hbOfficialTag:"Officiell",hbPublicTag:"Publik",hbTypeT:"Typ",hbOffCount:"Officiella tillägg: {n}",eliteAltReq:"Majoriteten av övriga kravförmågor minst på gesällnivå ({have} av minst {need})",attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",excPick:"Vilket karaktärsdrag?",excAllTaken:"Alla karaktärsdrag har redan förmågan.",excName:"Exceptionellt karaktärsdrag",excEditHint:"Här ändrar du grundvärdena (summa 80). +n kommer från Exceptionellt karaktärsdrag och läggs på automatiskt.",
+hbTitle:"Homebrew",hbIntro:"Husregler och egna förmågor, krafter, särdrag, fördelar och nackdelar.",hbOpen:"Öppna homebrew",hbRules:"Regelvarianter",hbContent:"Homebrew-innehåll",hbCreate:"Skapa homebrew",hbMine:"Mina homebrew",hbNone:"Du har inte skapat något ännu.",hbK_ability:"Förmåga",hbK_mystic:"Kraft / ritual",hbK_trait:"Särdrag",hbK_boon:"Fördel",hbK_burden:"Nackdel",hbNewT:"Ny homebrew: {x}",hbEditT:"Redigera homebrew",hbDesc:"Beskrivning",hbLevels:"Har nivåer (Novis, Gesäll, Mästare)",hbRanks:"Kan tas flera gånger (upp till 3)",hbPublic:"Publik",hbPublicHint:"Publik homebrew syns för andra användare som har slagit på Visa publicerade homebrew-tillägg.",hbNeedName:"Ge den ett namn.",hbNeedNovice:"Fyll i texten för Novis.",hbSaved:"{x} sparad",hbDeleted:"{x} borttagen",hbSaveErr:"Det gick inte att spara. Är du uppkopplad?",hbSetOffline:"Inställningen sparades bara på den här enheten (ingen uppkoppling).",hbConfirmDel:"Ta bort {x}? Rollpersoner som har den tappar den.",hbOwnTag:"Egen",hbOfficialTag:"Officiell",hbPublicTag:"Publik",hbTypeT:"Typ",hbOffCount:"Officiella tillägg: {n}",eliteAltReq:"Minst hälften av övriga kravförmågor på gesällnivå ({have} av minst {need})",attributes:"Karaktärsdrag",attrSum:"Summa {n} av 80",excPick:"Vilket karaktärsdrag?",excAllTaken:"Alla karaktärsdrag har redan förmågan.",excName:"Exceptionellt karaktärsdrag",excEditHint:"Här ändrar du grundvärdena (summa 80). +n kommer från Exceptionellt karaktärsdrag och läggs på automatiskt.",
 accurate:"Träffsäker",cunning:"Listig",discreet:"Diskret",persuasive:"Övertygande",quick:"Kvick",resolute:"Viljestark",strong:"Stark",vigilant:"Vaksam",
 toughness:"Tålighet",pain:"Smärtgräns",defense:"Försvar",corrThr:"Korruptionströskel",abomThr:"Styggelsetröskel",
 current:"Nu",damage:"Skada",tempCorr:"Temporär korruption",permCorr:"Permanent korruption",totalCorr:"Total korruption",
@@ -313,7 +314,7 @@ navChars:"Characters",navLib:"Library",libAbil:"Abilities",libItems:"Equipment",
 newChar:"New character",noChars:"No characters yet. Create your first one.",noHits:"No matches.",name:"Name",race:"Race",archetype:"Archetype",occupation:"Occupation",pickOrType:"Pick below or type your own",eliteGoal:"Elite occupation",eliteAsp:"Aspiring {x}",elitePickT:"Choose an elite occupation to strive for",eliteClear:"Remove goal",eliteShow:"Show the elite occupation",eliteChange:"Change",eliteInit:"Mark as initiated",eliteUndo:"Undo initiation",eliteNeedAll:"When every requirement is met, a roleplayed initiation is needed – then mark the character as initiated.",eliteDoneT:"Initiated {x}",eliteMaster:"At least one required ability at master level",eliteManual:"check yourself",eliteOther:"Other",eliteReqs:"Requirements",eliteDoneMsg:"{x} is now initiated!",eliteGeneral:"Other",color:"Colour",
 save:"Save",cancel:"Cancel",del:"Delete",edit:"Edit",add:"Add",close:"Close",confirmDel:"Delete {x}? This cannot be undone.",
 tOverview:"Overview",tAbilities:"Abilities",tCombat:"Combat",tGear:"Gear",tNotes:"Notes",
-hbTitle:"Homebrew",hbIntro:"House rules and your own abilities, powers, traits, boons and burdens.",hbOpen:"Open homebrew",hbRules:"Rule variants",hbContent:"Homebrew content",hbCreate:"Create homebrew",hbMine:"My homebrew",hbNone:"You haven't created anything yet.",hbK_ability:"Ability",hbK_mystic:"Power / ritual",hbK_trait:"Trait",hbK_boon:"Boon",hbK_burden:"Burden",hbNewT:"New homebrew: {x}",hbEditT:"Edit homebrew",hbDesc:"Description",hbLevels:"Has levels (Novice, Adept, Master)",hbRanks:"Can be taken several times (up to 3)",hbPublic:"Public",hbPublicHint:"Public homebrew is visible to other users who have turned on Show published homebrew.",hbNeedName:"Give it a name.",hbNeedNovice:"Fill in the Novice text.",hbSaved:"{x} saved",hbDeleted:"{x} deleted",hbSaveErr:"Could not save. Are you online?",hbSetOffline:"The setting was only saved on this device (offline).",hbConfirmDel:"Delete {x}? Characters that have it will lose it.",hbOwnTag:"Own",hbOfficialTag:"Official",hbPublicTag:"Public",hbTypeT:"Type",hbOffCount:"Official additions: {n}",eliteAltReq:"Most of the other required abilities at adept or higher ({have} of at least {need})",attributes:"Attributes",attrSum:"Total {n} of 80",excPick:"Which attribute?",excAllTaken:"Every attribute already has this ability.",excName:"Exceptional Attribute",excEditHint:"These are the base values (total 80). +n comes from Exceptional Attribute and is added automatically.",
+hbTitle:"Homebrew",hbIntro:"House rules and your own abilities, powers, traits, boons and burdens.",hbOpen:"Open homebrew",hbRules:"Rule variants",hbContent:"Homebrew content",hbCreate:"Create homebrew",hbMine:"My homebrew",hbNone:"You haven't created anything yet.",hbK_ability:"Ability",hbK_mystic:"Power / ritual",hbK_trait:"Trait",hbK_boon:"Boon",hbK_burden:"Burden",hbNewT:"New homebrew: {x}",hbEditT:"Edit homebrew",hbDesc:"Description",hbLevels:"Has levels (Novice, Adept, Master)",hbRanks:"Can be taken several times (up to 3)",hbPublic:"Public",hbPublicHint:"Public homebrew is visible to other users who have turned on Show published homebrew.",hbNeedName:"Give it a name.",hbNeedNovice:"Fill in the Novice text.",hbSaved:"{x} saved",hbDeleted:"{x} deleted",hbSaveErr:"Could not save. Are you online?",hbSetOffline:"The setting was only saved on this device (offline).",hbConfirmDel:"Delete {x}? Characters that have it will lose it.",hbOwnTag:"Own",hbOfficialTag:"Official",hbPublicTag:"Public",hbTypeT:"Type",hbOffCount:"Official additions: {n}",eliteAltReq:"At least half of the other required abilities at adept or higher ({have} of at least {need})",attributes:"Attributes",attrSum:"Total {n} of 80",excPick:"Which attribute?",excAllTaken:"Every attribute already has this ability.",excName:"Exceptional Attribute",excEditHint:"These are the base values (total 80). +n comes from Exceptional Attribute and is added automatically.",
 accurate:"Accurate",cunning:"Cunning",discreet:"Discreet",persuasive:"Persuasive",quick:"Quick",resolute:"Resolute",strong:"Strong",vigilant:"Vigilant",
 toughness:"Toughness",pain:"Pain Threshold",defense:"Defense",corrThr:"Corruption Threshold",abomThr:"Abomination Threshold",
 current:"Now",damage:"Damage",tempCorr:"Temporary corruption",permCorr:"Permanent corruption",totalCorr:"Total corruption",
@@ -614,7 +615,7 @@ function ownedList(c,types){
     .sort((a,b)=>nameOf(a.e).localeCompare(nameOf(b.e),lang));
   if(!rows.length) return `<div class="empty small">${t("none")}</div>`;
   return `<div class="owned">${rows.map(({o,i,e})=>`<button class="item" data-act="ownedDetail" data-i="${i}">
-     <div><div class="nm">${esc(ownedName(e,o))}</div><div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""}</div></div>
+     <div><div class="nm">${esc(ownedName(e,o))}${hbIco(e)}</div><div class="sub">${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""}</div></div>
      <div class="right">${hasLevels(e)?`<span class="pill lv">${t(["","novice","adept","master"][o.level||1])}</span>`:""}${maxRanks(e)>1?`<span class="pill lv">×${o.ranks||1}</span>`:""}<span class="pill num">${o.free?"0":costOf(e,o)} XP</span></div></button>`).join("")}</div>`;
 }
 function subAbilities(c){
@@ -754,7 +755,7 @@ function renderResults(root,sec){
     if(P.sort!=="name"&&!P.q.trim()){ const g=P.sort==="group"?groupKey(e):(STR[lang].books[e.book]||STR[lang].typesP[e.type]); if(g!==last){ html+=`<div class="grouphead">${esc(g)}</div>`; last=g; } }
     const has=c&&!isItem(e)&&c.abilities.some(o=>o.ref===e.id);
     const sub=isItem(e)?`${esc(STR[lang].types[e.type])} · ${esc(itemLine(e))}`:`${esc(STR[lang].types[e.type])}${groupLine(e)?" · "+esc(groupLine(e)):""} · ${esc(bookLine(e))}`;
-    html+=`<button class="res" data-act="detail" data-id="${e.id}"><div><div class="nm">${esc(nameOf(e))}</div>
+    html+=`<button class="res" data-act="detail" data-id="${e.id}"><div><div class="nm">${esc(nameOf(e))}${hbIco(e)}</div>
       <div class="sub">${sub}</div></div>
       ${has?`<span class="right pill ok">✓</span>`:""}</button>`;
   }
@@ -881,7 +882,7 @@ function openDetail(id,ownedIdx){
     if(maxRanks(e)>1) return [1,2,3].slice(0,maxRanks(e)).map(n=>`<button class="btn ${n===1?"primary":""}" data-addlv="0" data-rank="${n}">+ ${n}× <span class="small">(${5*n} XP)</span></button>`).join("");
     return `<button class="btn primary" data-addlv="0">+ ${t("add")} <span class="small">(${costOf(e,{})} XP)</span></button>`;
   };
-  const el=sheet(`<div class="sheet-head"><h2>${esc(owned?ownedName(e,owned):nameOf(e))}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
+  const el=sheet(`<div class="sheet-head"><h2>${esc(owned?ownedName(e,owned):nameOf(e))}${hbIco(e)}</h2><button class="iconbtn" data-close aria-label="${t("close")}">✕</button></div>
     <div class="sheet-body" id="dbody">${detailHtml(e,owned)}</div>${foot()?`<div class="sheet-foot">${foot()}</div>`:""}`,{tall:true,stack:true});
   el.addEventListener("click",ev=>{
     const b=ev.target.closest("button,input"); if(!b) return;
@@ -1044,7 +1045,7 @@ function eliteCheck(c,o){
     if(reqLevelled(g)) lvGroups.push(Math.max(0,...m.filter(y=>hasLevels(y.e)).map(y=>y.x.level||1))); });
   items.push({label:t("eliteMaster"),ok:hits.some(y=>hasLevels(y.e)&&(y.x.level||1)>=3)});
   if(SET.eliteAlt&&lvGroups.length>1){ const rest=[...lvGroups]; let mi=rest.findIndex(v=>v>=3); if(mi<0) mi=rest.indexOf(Math.max(...rest)); rest.splice(mi,1);
-    const need=Math.floor(rest.length/2)+1, have=rest.filter(v=>v>=2).length; items.push({label:t("eliteAltReq",{have,need}),ok:have>=need}); }
+    const need=Math.ceil(rest.length/2), have=rest.filter(v=>v>=2).length; items.push({label:t("eliteAltReq",{have,need}),ok:have>=need}); }
   const other=(o.sv.other||"").trim();
   if(other&&!/^inga$/i.test(other)){ const k=other.match(/korruption\s*(\d+)/i);
     if(k) items.push({label:other,ok:(+c.permCorr||0)<=+k[1]});
@@ -1105,12 +1106,14 @@ function listEdit(c,key,i,title,fields,blank){
 }
 
 /* ---------- homebrew: settings, content and editor ---------- */
+const HB_ICON=`<svg class="hbico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Homebrew"><title>Homebrew</title><circle cx="12" cy="12" r="10.6"/><g transform="rotate(-14 12 12.5) translate(12 11.9) scale(1.14) translate(-12 -12.8)" stroke-width="1.3"><path d="M7.6 10.2h7.6v7.6a1.2 1.2 0 0 1-1.2 1.2H8.8a1.2 1.2 0 0 1-1.2-1.2z" fill="currentColor" fill-opacity=".28"/><path d="M15.2 11.6h1.5a1.4 1.4 0 0 1 1.4 1.4v2.3a1.4 1.4 0 0 1-1.4 1.4h-1.5"/><path d="M7.1 10.3c-.9-.3-1.1-1.7-.1-2.2.1-1.3 1.6-1.8 2.5-1.1.6-1 2.3-1.1 2.9-.1.8-.6 2.3-.2 2.4.9 1 .2 1.2 1.6.4 2.1-.2.4-.6.5-1 .4" fill="var(--panel)"/></g></svg>`;
+const hbIco=e=>e&&e.hb?HB_ICON:"";
 const HB_TYPES=["ability","power","ritual","trait","monstrous","boon","burden"];
 /* toggles shown in the Homebrew view; add new ones here (g = which card they go in) */
 const HB_TOGGLES=[
   {k:"eliteAlt",g:"rules",def:false,
-   sv:["Alternativt krav för elityrke","Utöver att en kravförmåga ska vara på mästarnivå måste majoriteten av de övriga kravförmågorna vara minst på gesällnivå."],
-   en:["Alternative elite requirement","Besides one required ability at master level, most of the other required abilities must be at least adept."]},
+   sv:["Alternativt krav för elityrke","Utöver att en kravförmåga ska vara på mästarnivå måste minst hälften av de övriga kravförmågorna vara på gesällnivå."],
+   en:["Alternative elite requirement","Besides one required ability at master level, at least half of the other required abilities must be at adept or higher."]},
   {k:"hbOfficial",g:"content",def:true,
    sv:["Visa officiella homebrew-tillägg","Visar gruppens homebrew-innehåll som lagts in centralt."],
    en:["Show official homebrew","Shows the group's homebrew content added centrally."]},
