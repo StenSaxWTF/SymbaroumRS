@@ -373,6 +373,18 @@ const paras=s=>esc(s).split(/\n+/).map(p=>`<p>${p}</p>`).join("");
 /* ---------- rules data ---------- */
 let DATA=[], BYID={};
 const L=(e,l=lang)=>e[l]||e.sv;
+/* item categories are stored in Swedish; English labels for display */
+const IT_EN={"Rustning":"Armor","Lätt rustning":"Light armor","Medeltung rustning":"Medium armor","Tung rustning":"Heavy armor","Alkemiskt elixir":"Alchemical elixir",
+ "Svag":"Weak","Svagt":"Weak","Medelstark":"Moderate","Medelstarkt":"Moderate","Stark":"Strong","Starkt":"Strong","Fälla":"Trap","Lägre artefakt":"Lesser artifact",
+ "Novis":"Novice","Gesäll":"Adept","Mästare":"Master","Musikinstrument":"Musical instrument","Specialverktyg":"Tools of the trade","Tobaksdon":"Tobacco utensils","Tobakssorter":"Tobacco types",
+ "Verktyg":"Tools","Bruksföremål":"Equipment","Byggnader":"Buildings","Färdmedel":"Transport","Lätt":"Light","Tung":"Heavy","Förvaring":"Containers","Liten":"Small","Stor":"Large",
+ "Gårdsdjur":"Farm animals","Handelsvaror":"Trade goods","Kläder":"Clothing","Mat och dryck":"Food and drink","Desserter":"Desserts","Drycker":"Beverages","Fiskrätter":"Fish",
+ "Gröt":"Porridge","Kötträtter":"Meat","Pajer":"Pies","Soppor":"Soups","Stuvningar":"Stews","Te":"Tea","Ammunition":"Ammunition","Pil":"Arrows and bolts","Projektilvapen":"Projectile weapon",
+ "Avståndsvapen":"Ranged weapon","Kastvapen":"Throwing weapon","Närstridsvapen":"Melee weapon","Enhandsvapen":"Single-handed weapon","Korta vapen":"Short weapon","Långa vapen":"Long weapon",
+ "Obeväpnad attack":"Unarmed attack","Sköld":"Shield","Tunga vapen":"Heavy weapon","Special":"Special","Belägringsvapen":"Siege weapon","Vapen":"Weapon","Rustning/Sköld":"Armor/Shield","Vapen/Rustning":"Weapon/Armor"};
+const itl=x=>lang==="en"&&x&&IT_EN[x]||x;
+const LV_KEY={"Novis":"novice","Gesäll":"adept","Mästare":"master"};
+function qualsLabel(str){ if(lang!=="en"||!str) return str; return qualTokens(str).map(x=>{ const q=findQual(x); return q?nameOf(q)+((x.match(/\s*\([^)]*\)\s*$/)||[""])[0]):x; }).join(", "); }
 const nameOf=e=>L(e).name;
 const hasLevels=e=>e.type!=="ritual" && !!(e.sv.novice||e.en.novice);
 /* ---------- items: qualities, impeding, money ---------- */
@@ -390,7 +402,7 @@ function findQual(tok){
 const qualTokens=str=>String(str||"").split(/,|\beller\b/).map(x=>x.trim()).filter(x=>x&&x!=="-");
 const hasQual=(str,name)=>qualTokens(str).some(x=>{const q=findQual(x); return q&&q.sv.name===name;});
 function qualChips(str,small){
-  return qualTokens(str).map(x=>{const q=findQual(x); return q?`<button class="qchip${small?" sm":""}" data-qual="${q.id}" title="${esc(q.sv.name)}">${esc(x)}</button>`:`<span class="pill">${esc(x)}</span>`;}).join(" "); }
+  return qualTokens(str).map(x=>{const q=findQual(x); return q?`<button class="qchip${small?" sm":""}" data-qual="${q.id}" title="${esc(nameOf(q))}">${esc(lang==="en"?qualsLabel(x):x)}</button>`:`<span class="pill">${esc(x)}</span>`;}).join(" "); }
 function calcImpede(str){
   const m=String(str||"").match(/Begränsande\s*\(\s*[−-]\s*(\d)\s*\)/); if(!m) return 0;
   let v=-(+m[1]); if(hasQual(str,"Smidigt")) v=Math.min(0,v+2); if(hasQual(str,"Otympligt")) v-=1; return v; }
@@ -401,9 +413,9 @@ function payFor(c,cost){ const p=parseCost(cost); if(p==null) return {ok:true,am
   const m=c.money; const tot=(m.daler||0)*100+(m.skilling||0)*10+(m.ortug||0); if(tot<p) return {ok:false};
   const n=tot-p; m.daler=Math.floor(n/100); m.skilling=Math.floor(n%100/10); m.ortug=n%10; return {ok:true,amount:p}; }
 function itemLine(e){ const it=e.item||{};
-  if(e.type==="quality") return [t("qkind")[it.kind]||it.kind, it.applies].filter(Boolean).join(" · ");
-  if(isGearT(e.type)) return [it.cat, it.cost].filter(Boolean).join(" · ");
-  return [it.sub, it.dmg, it.quals&&it.quals!=="Speciell"?it.quals:"", it.cost].filter(Boolean).join(" · "); }
+  if(e.type==="quality") return [t("qkind")[it.kind]||it.kind, itl(it.applies)].filter(Boolean).join(" · ");
+  if(isGearT(e.type)) return [itl(it.cat), it.cost].filter(Boolean).join(" · ");
+  return [itl(it.sub), it.dmg, it.quals&&it.quals!=="Speciell"?qualsLabel(it.quals):"", it.cost].filter(Boolean).join(" · "); }
 /* boons whose text says they can be acquired several times (max three) */
 const maxRanks=e=>{ if(e._mr!==undefined) return e._mr; if(e.hb) return e._mr=e.hb.ranks?3:1;
   const txt=[e.sv.desc,e.sv.novice,e.en.desc,e.en.novice].join(" ");
@@ -421,7 +433,7 @@ function groupLine(e){
   if(e.race) bits.push(t("race_")+": "+(lang==="en"?(RACE_EN[e.race]||e.race):e.race));
   return bits.join(" · ");
 }
-function bookLine(e){ if(e.hb) return t("hbTitle")+" · "+hbTag(e); return (STR[lang].books[e.book]||e.book)+(e.ref?" · "+e.ref:""); }
+function bookLine(e){ if(e.hb) return t("hbTitle")+" · "+hbTag(e); return [STR[lang].books[e.book]||e.book,e.ref].filter(Boolean).join(" · "); }
 
 /* ---------- state + storage (Supabase) ---------- */
 const S={chars:[], view:"chars", charId:null, sub:"overview", syncState:"connecting", user:null};
@@ -494,13 +506,13 @@ async function refreshRules(cached){
   setRules(out); try{ await IDB.set("rules",{ver,data:out}); }catch(e){}
   if(cached && S.user && !document.querySelector("#layer .scrim") && !isTyping()) render();
 }
-function setRules(d){ RULES=d; d.forEach(e=>{ if(!e.en) e.en=e.sv; }); rebuildData(); }
+function setRules(d){ RULES=d; d.forEach(e=>{ if(!e.en) e.en=e.sv; else if(e.item&&e.en!==e.sv) e.en=Object.assign({},e.sv,e.en); }); rebuildData(); }
 /* ---------- name links (chips for abilities etc. inside texts) ---------- */
 let NIDX=null;
 const LINK_PREF={boons:["boon"],burdens:["burden"]};
 const NAME_ALIAS={"Regenerera":"Regeneration","Teleportera":"Teleportering","Tankestöt":"Sinnesstöt","Häxkonst":"Häxkonster","Levande fort":"Levande fästning","Förhäxad terräng":"Förhäxande landskap","Priviligierad":"Privilegierad","Snabbeld":"Snabbskytte"};
 function nameIndex(){ if(NIDX) return NIDX; const m={};
-  DATA.forEach(e=>{ if(!ABIL_TYPES.includes(e.type)||e.hb) return; (m[e.sv.name]=m[e.sv.name]||[]).push(e); });
+  DATA.forEach(e=>{ if(!ABIL_TYPES.includes(e.type)||e.hb) return; (m[e.sv.name]=m[e.sv.name]||[]).push(e); const en=e.en&&e.en.name; if(en&&en!==e.sv.name) (m[en]=m[en]||[]).push(e); });
   Object.entries(NAME_ALIAS).forEach(([a,n])=>{ if(m[n]&&!m[a]) m[a]=m[n]; });
   const names=Object.keys(m).sort((a,b)=>b.length-a.length).map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"));
   NIDX={m,re:new RegExp("(?<![\\p{L}])("+names.join("|")+")(?![\\p{L}])","gu")}; return NIDX; }
@@ -719,7 +731,7 @@ function pickerHtml(sec){
   if(showTrad) groupRow=`<div class="chips"><span class="lab">${t("tradition")}</span>${chip("group","all",t("all"))}${TRADS.map(x=>chip("group",x,tr(x))).join("")}</div>`;
   else if(showArch) groupRow=`<div class="chips"><span class="lab">${t("arche")}</span>${chip("group","all",t("all"))}${ARCHES.map(x=>chip("group",x,ar(x))).join("")}</div>`;
   const itemType=ITEM_SECS[sec]?(SECTIONS[sec].length>1?(P.type!=="all"?P.type:null):SECTIONS[sec][0]):(!sec&&ITEM_TYPES.includes(P.type)?P.type:null);
-  if(itemType) groupRow=`<div class="chips"><span class="lab">${t(itemType==="quality"?"kind":"category")}</span>${chip("group","all",t("all"))}${itemGroups(itemType).map(x=>chip("group",x,itemType==="quality"?(t("qkind")[x]||x):x)).join("")}</div>`;
+  if(itemType) groupRow=`<div class="chips"><span class="lab">${t(itemType==="quality"?"kind":"category")}</span>${chip("group","all",t("all"))}${itemGroups(itemType).map(x=>chip("group",x,itemType==="quality"?(t("qkind")[x]||x):itl(x))).join("")}</div>`;
   const showBook=!ITEM_SECS[sec]&&!libItems;
   return `<div class="filters" style="margin:${sec?"0":"0 -16px"}">
     <input class="t" type="search" id="pq" placeholder="${t("search")}" value="${esc(P.q)}" aria-label="${t("search")}">
@@ -733,7 +745,7 @@ function pickerHtml(sec){
 function groupKey(e){
   if(e.type==="power"||e.type==="ritual"||e.type==="tradition") return e.specialization?tr(e.traditions[0])+" – "+sp(e.specialization):(e.traditions.map(tr).join(", ")||"—");
   if(e.type==="ability") return e.archetypes.length?e.archetypes.map(ar).join(", "):"—";
-  if(e.item) return (isGearT(e.type)?e.item.cat:e.type==="quality"?(t("qkind")[e.item.kind]||e.item.kind):e.item.sub)||STR[lang].typesP[e.type];
+  if(e.item) return itl(isGearT(e.type)?e.item.cat:e.type==="quality"?(t("qkind")[e.item.kind]||e.item.kind):e.item.sub)||STR[lang].typesP[e.type];
   return STR[lang].typesP[e.type];
 }
 function filterData(sec){
@@ -796,7 +808,7 @@ function racesList(){ const all=DATA.filter(e=>e.type==="race"); const q=(P.rq||
   return html||`<div class="empty">${t("noHits")}</div>`; }
 function labPara(p,opt){ const m=p.match(/^([A-ZÅÄÖ][^:]{1,34}):\s(.+)$/s); if(m&&!/[.,;]/.test(m[1])) return `<p><b>${esc(m[1])}:</b> ${opt?linkify(m[2],opt):esc(m[2])}</p>`; return `<p>${opt?linkify(p,opt):esc(p)}</p>`; }
 function raceHtml(r){ const s=L(r);
-  return `<div class="occ"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px"><span class="pill">${esc(STR[lang].books[r.book]||r.book)}</span><span class="pill">${esc(r.ref)}</span>${lang==="en"?`<span class="pill">${t("svOnly")}</span>`:""}</div>
+  return `<div class="occ"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px"><span class="pill">${esc(STR[lang].books[r.book]||r.book)}</span><span class="pill">${esc(r.ref)}</span>${lang==="en"&&L(r)===r.sv?`<span class="pill">${t("svOnly")}</span>`:""}</div>
     <div class="detail">${(s.text||[]).map(p=>`<p>${linkify(p,{minLen:5})}</p>`).join("")}</div>
     <dl>${(s.sections||[]).map(([h,ps])=>{ const opt=/namn/i.test(h)?null:/särdrag/i.test(h)?{}:{minLen:5};
       return `<div><dt>${esc(h)}</dt><dd class="detail">${ps.map(p=>labPara(p,opt)).join("")}</dd></div>`; }).join("")}</dl></div>`; }
@@ -812,7 +824,7 @@ function jobsHtml(){
   if(!arches.length) return `<div class="empty" style="margin-top:16px">${t("libJobsEmpty")}</div>`;
   return `<div class="filters" style="margin:0 -16px"><input class="t" type="search" id="jq" data-libsearch="jobs" placeholder="${t("search")}" value="${esc(P.jq||"")}" aria-label="${t("search")}"><div class="chips"><span class="lab">${t("typ")}</span>${ch("all",t("all"))}${ch("common",t("jobsCommon"))}${ch("elite",t("jobsElite"))}</div></div><div class="results" id="libres">${jobsList()}</div>`;
 }
-const textHit=(e,q)=>{ if(!q) return true; const s=e.sv; return [s.name,s.quote,s.sub,s.race,s.abilities,s.req,s.unique,...(s.text||[]),...(s.sections||[]).flatMap(([h,ps])=>[h,...ps])].filter(Boolean).join(" ").toLowerCase().includes(q); };
+const textHit=(e,q)=>{ if(!q) return true; return [e.sv,e.en||{}].some(s=>[s.name,s.quote,s.sub,s.race,s.abilities,s.req,s.unique,...(s.text||[]),...(s.sections||[]).flatMap(([h,ps])=>[h,...ps])].filter(Boolean).join(" ").toLowerCase().includes(q)); };
 function jobsList(){ const f=P.jobs||"all"; const q=(P.jq||"").trim().toLowerCase(); let html="";
   const arches=ARCH_ORDER.map(k=>DATA.find(e=>e.type==="archetype"&&e.arch===k)).filter(Boolean);
   arches.forEach(a=>{ const list=occsOf(a.arch).filter(o=>(f==="all"||(f==="elite")===!!o.elite)&&textHit(o,q)); if(!list.length) return;
@@ -820,7 +832,7 @@ function jobsList(){ const f=P.jobs||"all"; const q=(P.jq||"").trim().toLowerCas
     const shown=new Set(list.map(o=>o.id));
     const row=(o,child)=>{ const s=L(o); const par=o.parent&&BYID[o.parent];
       return `<button class="res${child?" child":""}" data-act="occ" data-id="${o.id}"><div style="min-width:0"><div class="nm">${esc(s.name)}</div>
-      <div class="quote">${esc(s.quote||"")}</div><div class="sub">${esc([o.sv.sub,o.ref].filter(Boolean).join(" · "))}</div></div>
+      <div class="quote">${esc(s.quote||"")}</div><div class="sub">${esc([L(o).sub,o.ref].filter(Boolean).join(" · "))}</div></div>
       ${o.elite?`<span class="right pill elite">${par?t("eliteFor",{x:L(par).name}):t("elite")}</span>`:""}</button>`; };
     list.forEach(o=>{ if(o.parent&&shown.has(o.parent)) return;
       html+=row(o,false); list.filter(c=>c.parent===o.id).forEach(c=>html+=row(c,true)); }); });
@@ -831,12 +843,12 @@ function fieldHtml(label,val,field){ if(!val) return "";
   return `<div><dt>${label}</dt><dd>${lines}</dd></div>`; }
 function occHtml(o){ const s=L(o); const a=DATA.find(x=>x.type==="archetype"&&x.arch===o.arch);
   return `<div class="occ"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px">
-    ${a?`<button class="pill" data-arch="${a.id}">${esc(L(a).name)} ›</button>`:""}${o.parent&&BYID[o.parent]?`<button class="pill" data-occ="${o.parent}">${esc(t("eliteFor",{x:L(BYID[o.parent]).name}))} ›</button>`:o.elite?`<span class="pill elite">${t("elite")}</span>`:""}${o.sv.sub?`<span class="pill">${esc(o.sv.sub)}</span>`:""}<span class="pill">${esc(o.ref)}</span>${lang==="en"?`<span class="pill">${t("svOnly")}</span>`:""}</div>
+    ${a?`<button class="pill" data-arch="${a.id}">${esc(L(a).name)} ›</button>`:""}${o.parent&&BYID[o.parent]?`<button class="pill" data-occ="${o.parent}">${esc(t("eliteFor",{x:L(BYID[o.parent]).name}))} ›</button>`:o.elite?`<span class="pill elite">${t("elite")}</span>`:""}${o.sv.sub?`<span class="pill">${esc(L(o).sub)}</span>`:""}<span class="pill">${esc(o.ref)}</span>${lang==="en"&&L(o)===o.sv?`<span class="pill">${t("svOnly")}</span>`:""}</div>
     ${s.quote?`<p class="quote">${esc(s.quote)}</p>`:""}<div class="detail">${(s.text||[]).map(p=>`<p>${linkify(p,{minLen:5})}</p>`).join("")}</div>
     <dl>${fieldHtml(t("occRace"),s.race)}${fieldHtml(t(o.elite?"occReq":"occAbil"),o.elite?s.req:s.abilities)}${fieldHtml(t("occOther"),s.other)}${fieldHtml(t("occUnique"),s.unique)}${fieldHtml(t("occBoons"),s.boons,"boons")}${fieldHtml(t("occBurdens"),s.burdens,"burdens")}</dl>
     ${o.elite?`<p class="note">${t("eliteNote")}</p>`:""}</div>`; }
 function archHtml(a){ const s=L(a); const occs=occsOf(a.arch);
-  return `<div class="occ"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px"><span class="pill">${t("archetype")}</span><span class="pill">${esc(a.ref)}</span>${lang==="en"?`<span class="pill">${t("svOnly")}</span>`:""}</div>
+  return `<div class="occ"><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px"><span class="pill">${t("archetype")}</span><span class="pill">${esc(a.ref)}</span>${lang==="en"&&L(a)===a.sv?`<span class="pill">${t("svOnly")}</span>`:""}</div>
     <div class="detail">${(s.text||[]).map(p=>`<p>${linkify(p,{minLen:5})}</p>`).join("")}</div>
     <dl>${fieldHtml(t("archAbility"),s.ability)}<p class="note" style="margin:0">${t("archNote")}</p>
     <div><dt>${t("archAbils")}</dt><dd>${(s.abilities||[]).map(([k,v])=>`<span class="ln"><b>${esc(k)}:</b> ${linkify(v)}</span>`).join("")}</dd></div>
@@ -908,19 +920,20 @@ function openDetail(id,ownedIdx){
 function itemDetailHtml(e){
   const it=e.item||{}; const rows=[];
   const row=(k,v)=>v?rows.push(`<div class="kv"><span>${k}</span><span>${v}</span></div>`):0;
-  if(e.type==="quality"){ row(t("kind"),esc(t("qkind")[it.kind]||it.kind)); row(t("applies"),esc(it.applies||"")); if(e.ref) row(t("book"),esc(bookLine(e))); }
-  else { row(t("category"),esc([it.cat,it.sub].filter(Boolean).join(" · ")));
+  if(e.type==="quality"){ row(t("kind"),esc(t("qkind")[it.kind]||it.kind)); row(t("applies"),esc(itl(it.applies)||"")); if(e.ref) row(t("book"),esc(bookLine(e))); }
+  else { row(t("category"),esc([itl(it.cat),itl(it.sub)].filter(Boolean).join(" · ")));
     row(e.type==="armor"?t("prot"):t("dmg"),esc(it.dmg||""));
     if(it.quals) row(t("quality"),qualChips(it.quals));
     if(e.type==="armor") row(t("impede"),String(calcImpede(it.quals)));
     row(t("cost"),esc(it.cost||""));
-    if(it.ability) row(t("requires"),esc(it.ability+(it.level?" ("+it.level.toLowerCase()+")":"")));
+    if(it.ability){ const ab=RULES.find(x=>x.sv.name===it.ability&&ABIL_TYPES.includes(x.type)); const lv=it.level?(LV_KEY[it.level]?t(LV_KEY[it.level]).toLowerCase():it.level.toLowerCase()):"";
+      row(t("requires"),esc((ab?nameOf(ab):it.ability)+(lv?" ("+lv+")":""))); }
     if(it.blackMarket) row("",`<span class="pill warn">${t("blackMarket")}</span>`); }
   let extra="";
   if(e.type==="quality"){ const items=DATA.filter(x=>x.item&&x.item.quals&&qualTokens(x.item.quals).some(tok=>{const q=findQual(tok); return q&&q.id===e.id;}));
-    if(items.length) extra=`<h4 class="sub-h" style="margin-top:14px">${t("withQual")}</h4><div class="qrow">${items.map(x=>`<button class="qchip" data-qitem="${x.id}">${esc(x.sv.name)}</button>`).join(" ")}</div>`; }
-  return `<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"><span class="pill">${esc(STR[lang].types[e.type])}</span>${lang==="en"?`<span class="pill">${t("svOnly")}</span>`:""}</div>
-    ${rows.length?`<div class="kvs">${rows.join("")}</div>`:""}<div class="detail" style="margin-top:12px">${paras(e.sv.desc||"")}</div>${extra}`;
+    if(items.length) extra=`<h4 class="sub-h" style="margin-top:14px">${t("withQual")}</h4><div class="qrow">${items.map(x=>`<button class="qchip" data-qitem="${x.id}">${esc(nameOf(x))}</button>`).join(" ")}</div>`; }
+  return `<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:10px"><span class="pill">${esc(STR[lang].types[e.type])}</span>${lang==="en"&&(L(e)===e.sv||L(e).desc===e.sv.desc&&e.sv.desc)?`<span class="pill">${t("svOnly")}</span>`:""}</div>
+    ${rows.length?`<div class="kvs">${rows.join("")}</div>`:""}<div class="detail" style="margin-top:12px">${paras(L(e).desc||"")}</div>${extra}`;
 }
 function openItemDetail(id,sec){
   const e=BYID[id]; if(!e) return; const c=cur();
@@ -1045,7 +1058,10 @@ function eliteCheck(c,o){
   const reqLevelled=g=>splitTop(g," eller ").some(a=>{ const name=(a.match(/^(.+?)\s*\(/)||[0,a])[1].trim();
     if(name==="Mystisk kraft") return true; if(name==="Ritualist") return false;
     const e=RULES.find(x=>x.sv.name===name&&ABIL_TYPES.includes(x.type)); return !!e&&hasLevels(e); });
-  splitTop(o.sv.req||"",",").forEach(g=>{ const m=splitTop(g," eller ").flatMap(altMatch); hits=hits.concat(m); items.push({label:g,ok:m.length>0});
+  const svG=splitTop(o.sv.req||"",","), enG=lang==="en"&&o.en&&o.en.req&&o.en!==o.sv?splitTop(o.en.req,",").map(x=>x.trim()):null;
+  const enLabel=g=>{ if(!enG) return g; const hits=RULES.filter(x=>ABIL_TYPES.includes(x.type)&&g.includes(x.sv.name)&&x.en&&x.en.name).sort((a,b)=>b.sv.name.length-a.sv.name.length);
+    for(const h of hits){ const m=enG.filter(x=>x.toLowerCase().includes(h.en.name.toLowerCase())); if(m.length===1) return m[0]; } return g; };
+  svG.forEach(g=>{ const m=splitTop(g," eller ").flatMap(altMatch); hits=hits.concat(m); items.push({label:enLabel(g),ok:m.length>0});
     if(reqLevelled(g)) lvGroups.push(Math.max(0,...m.filter(y=>hasLevels(y.e)).map(y=>y.x.level||1))); });
   items.push({label:t("eliteMaster"),ok:hits.some(y=>hasLevels(y.e)&&(y.x.level||1)>=3)});
   if(SET.eliteAlt&&lvGroups.length>1){ const rest=[...lvGroups]; let mi=rest.findIndex(v=>v>=3); if(mi<0) mi=rest.indexOf(Math.max(...rest)); rest.splice(mi,1);
@@ -1062,7 +1078,7 @@ function eliteBar(c){ const o=c.elite&&BYID[c.elite.ref]; if(!o) return ""; cons
   return `<button class="elitebar" data-act="eliteInfo"><span class="ico">☆</span><span class="lbl"><small>${t("eliteAsp",{x:""}).trim()}</small>${esc(n)}</span><span class="cnt${r.met===r.total?" ok":""}">${r.met} / ${r.total}</span></button>`; }
 function elitePick(c){
   const elites=DATA.filter(e=>e.type==="occupation"&&e.elite);
-  const row=o=>`<button class="res" data-pick="${o.id}"><span class="pickico">${eliteIcon(o.id)}</span><div style="min-width:0"><div class="nm">${esc(L(o).name)}</div><div class="sub">${esc([o.sv.sub,o.ref].filter(Boolean).join(" · "))}</div></div>${c.elite&&c.elite.ref===o.id?`<span class="right" style="color:#d9b25f">★</span>`:""}</button>`;
+  const row=o=>`<button class="res" data-pick="${o.id}"><span class="pickico">${eliteIcon(o.id)}</span><div style="min-width:0"><div class="nm">${esc(L(o).name)}</div><div class="sub">${esc([L(o).sub,o.ref].filter(Boolean).join(" · "))}</div></div>${c.elite&&c.elite.ref===o.id?`<span class="right" style="color:#d9b25f">★</span>`:""}</button>`;
   let html=`<div class="results">`;
   archList().forEach(a=>{ const list=elites.filter(o=>o.arch===a.arch).sort((x,y)=>L(x).name.localeCompare(L(y).name,"sv")); if(!list.length) return;
     html+=`<div class="grouphead">${esc(L(a).name)}</div>`;
